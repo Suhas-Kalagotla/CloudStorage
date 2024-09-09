@@ -1,0 +1,19 @@
+.loginContainer {
+  margin: auto;
+  width: 30%;
+  border: 2px solid black;
+  padding: 10px;
+  text-align: left;
+  border-radius: 10px;
+}
+
+.loginError {
+  color: red;
+  text-decoration: underline;
+}
+
+.switch {
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+}
