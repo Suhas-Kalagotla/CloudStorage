@@ -3,16 +3,34 @@ import "./login.css";
 import { InputField, PasswordField } from "../util";
 
 const Login = ({ onFormSwitch }) => {
-  const handleSubmit = async (e) => {
-    console.log("submit made");
-  };
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!passwordVisible);
-  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [errors, setErrors] = useState();
+  const [errors, setErrors] = useState([]);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  const validateForm = () => {
+    const newErrors = [];
+    if (!email) newErrors.push("Email is required.");
+    if (!password) newErrors.push("Password is required.");
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrors([]);
+    const validationErrors = validateForm();
+
+    if (validationErrors.length > 0) {
+        setErrors(validationErrors); 
+      return;
+
+  }
+    console.log("submit made");
+  };
   return (
     <div className="loginContainer">
       <form className="loginForm" onSubmit={handleSubmit}>
@@ -36,13 +54,21 @@ const Login = ({ onFormSwitch }) => {
           />
         </div>
 
-        <p className="loginError">{errors && errors}</p>
         <button className="loginButton" type="submit">
           Log In
         </button>
+        {errors.length > 0 && (
+          <div className="errorContainer">
+            {errors.map((error, index) => (
+              <p className="loginError">
+                {index + 1}. {error}
+              </p>
+            ))}
+          </div>
+        )}
       </form>
       <p>
-        Don't have an acccount?{" "}
+        Don't have an acccount?
         <a className="switch" onClick={() => onFormSwitch("register")}>
           Register here
         </a>
