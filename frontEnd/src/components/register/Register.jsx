@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { InputField, PasswordField } from "../util";
+import { url } from "../../utils/url";
+import axios from "axios";
 
 const Register = ({ onFormSwitch }) => {
   const [email, setEmail] = useState("");
@@ -48,7 +50,27 @@ const Register = ({ onFormSwitch }) => {
       setErrors(validationErrors); // Set all errors at once
       return;
     }
-    console.log("form submitted");
+    try {
+      await axios.post(`${url}/auth/register`, {
+        email,
+        userName,
+        password,
+      });
+      onFormSwitch("login");
+    } catch (error) {
+      if (error.response && error.response.status) {
+        if (error.response.status === 409) {
+          setErrors([error.response.data.error]);
+        } else if (error.response.status === 500) {
+          setErrors([
+            error.response.data.error ||
+              "Something went wrong. Please try again.",
+          ]);
+        }
+      } else {
+        setErrors([error.message || "Unexpected error. Please try again."]);
+      }
+    }
   };
 
   return (
@@ -102,9 +124,9 @@ const Register = ({ onFormSwitch }) => {
       </form>
       <p>
         Already have an account?
-        <a className="switch" onClick={() => onFormSwitch("login")}>
+        <button className="switch" onClick={() => onFormSwitch("login")}>
           Log in here
-        </a>
+        </button>
       </p>
     </div>
   );

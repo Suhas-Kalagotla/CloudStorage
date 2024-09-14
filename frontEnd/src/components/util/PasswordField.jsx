@@ -10,6 +10,7 @@ export const PasswordField = ({
     <label htmlFor={name}>{label}</label>
     <div className="loginDiv">
       <input
+        className="Input"
         value={value}
         onChange={onChange}
         type={visible ? "text" : "password"}

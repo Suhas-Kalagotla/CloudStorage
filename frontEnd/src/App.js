@@ -1,11 +1,7 @@
 import "./App.css";
-import { Home, Login, Register } from "./components";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
-import { useState} from 'react'
+import { Home, Login, Register, Dashboard } from "./components";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
 function App() {
   const toggleForm = (formName) => {
     setCurrentForm(formName);
@@ -20,13 +16,16 @@ function App() {
           <Route
             path="/login"
             element={
-              currentForm == "login" ? (
+              currentForm === "login" ? (
                 <Login onFormSwitch={toggleForm} />
               ) : (
                 <Register onFormSwitch={toggleForm} />
               )
             }
           />
+          <Route path="/admin">
+            <Route path="/admin/dashboard" element={<Dashboard />} />
+          </Route>
         </Routes>
       </Router>
     </div>

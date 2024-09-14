@@ -1,12 +1,16 @@
 import { useState } from "react";
 import "./login.css";
 import { InputField, PasswordField } from "../util";
+import { url } from "../../utils/url";
+import axios from "axios";
+import { useNavigate} from "react-router-dom";
 
 const Login = ({ onFormSwitch }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [errors, setErrors] = useState([]);
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -25,11 +29,31 @@ const Login = ({ onFormSwitch }) => {
     const validationErrors = validateForm();
 
     if (validationErrors.length > 0) {
-        setErrors(validationErrors); 
+      setErrors(validationErrors);
       return;
-
-  }
-    console.log("submit made");
+    }
+    try {
+      const response = await axios.post(`${url}/auth/login`, {
+        email,
+        password,
+      });
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", response.data.user);
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (response.status === 500) {
+        setError("Server Error");
+      } else if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setErrors([err.response.data.error]);
+      } else {
+        setErrors(["Something went wrong. Please try again later."]);
+      }
+    }
   };
   return (
     <div className="loginContainer">
@@ -69,9 +93,9 @@ const Login = ({ onFormSwitch }) => {
       </form>
       <p>
         Don't have an acccount?
-        <a className="switch" onClick={() => onFormSwitch("register")}>
+        <button className="switch" onClick={() => onFormSwitch("register")}>
           Register here
-        </a>
+        </button>
       </p>
     </div>
   );
