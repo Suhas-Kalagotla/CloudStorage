@@ -28,7 +28,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
     getUserByEmail(email, async (err, user) => {
       if (err) {
         return res.status(500).json({ error: "Database Error", details: err });
@@ -47,7 +47,12 @@ const login = async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: "7d" },
       );
-      res.status(200).json({ message: "Login Successfull", token,user });
+      delete user.password;
+      res.status(200).json({
+        message: "Login Successfull",
+        token,
+        user,
+      });
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

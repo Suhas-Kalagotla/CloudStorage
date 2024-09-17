@@ -13,11 +13,20 @@ const insertUser = (userName, email, password, role, callback) => {
 
 const getUserByEmail = (email, callback) => {
   const query = `SELECT * FROM users WHERE email = ? `;
-  db.query(query,[email],(err,result)=>{
-    if(err)return callback(err); 
-    if(result.length==0) return callback(null,null); 
-    callback(null,result[0]); 
-  })
+  db.query(query, [email], (err, result) => {
+    if (err) return callback(err);
+    if (result.length == 0) return callback(null, null);
+    callback(null, result[0]);
+  });
 };
 
-module.exports = { insertUser,getUserByEmail };
+const getAllUsers = (callback) => {
+  const query = `SELECT * FROM users`;
+  db.query(query, [], (err, result) => {
+    if (err) return callback(err);
+
+    callback(null, result);
+  });
+};
+
+module.exports = { insertUser, getUserByEmail, getAllUsers };
