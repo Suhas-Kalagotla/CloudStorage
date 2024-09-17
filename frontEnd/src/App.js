@@ -1,5 +1,5 @@
 import "./App.css";
-import { Home, Login, Register, Dashboard } from "./components";
+import { Home, Login, Register, Dashboard, NotFound } from "./components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 function App() {
@@ -24,8 +24,9 @@ function App() {
             }
           />
           <Route path="/admin">
-            <Route path="/admin/dashboard" element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
           </Route>
+          <Route path="*" element=<NotFound /> />
         </Routes>
       </Router>
     </div>

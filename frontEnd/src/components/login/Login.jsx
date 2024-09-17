@@ -3,7 +3,7 @@ import "./login.css";
 import { InputField, PasswordField } from "../util";
 import { url } from "../../utils/url";
 import axios from "axios";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = ({ onFormSwitch }) => {
   const [email, setEmail] = useState("");
@@ -38,10 +38,10 @@ const Login = ({ onFormSwitch }) => {
         password,
       });
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", response.data.user);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       const user = JSON.parse(localStorage.getItem("user"));
       if (response.status === 500) {
-        setError("Server Error");
+        setErrors("Server Error");
       } else if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
