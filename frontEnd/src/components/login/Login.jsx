@@ -6,6 +6,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Login = ({ onFormSwitch }) => {
+  const logout = async (e) => {
+    await axios.post(`${url}/logout`);
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -37,7 +40,6 @@ const Login = ({ onFormSwitch }) => {
         email,
         password,
       });
-      localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       const user = JSON.parse(localStorage.getItem("user"));
       if (response.status === 500) {
@@ -97,6 +99,7 @@ const Login = ({ onFormSwitch }) => {
           Register here
         </button>
       </p>
+      <button onClick={() => logout()}> logout</button>
     </div>
   );
 };
