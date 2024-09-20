@@ -8,8 +8,13 @@ import { useNavigate } from "react-router-dom";
 const Login = ({ onFormSwitch }) => {
   const logout = async () => {
     try {
-      const response = await axios.post(`${url}/auth/logout`);
-      console.log(response.status);
+      const response = await axios.post(
+        `${url}/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
     } catch (err) {
       console.log(err);
     }
@@ -94,7 +99,7 @@ const Login = ({ onFormSwitch }) => {
           Log In
         </button>
         {errors.length > 0 && (
-          <div className="errorContainer">
+          <div className="errorsContainer">
             {errors.map((error, index) => (
               <p className="loginError">
                 {index + 1}. {error}

@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const verifyToken = require("./middleware/verifyToken.js");
 const authenticationRoutes = require("./routes/authenticationRoutes.js");
 const adminRoutes = require("./routes/admin.js");
 const app = express();
@@ -19,7 +18,7 @@ app.use(
 );
 
 app.use("/auth", authenticationRoutes);
-app.use("/admin", verifyToken, adminRoutes);
+app.use("/admin", adminRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running on port 3001");

@@ -113,7 +113,7 @@ const Register = ({ onFormSwitch }) => {
           Register
         </button>
         {errors.length > 0 && (
-          <div className="errorContainer">
+          <div className="errorsContainer">
             {errors.map((error, index) => (
               <p className="loginError" key={index}>
                 {index + 1}. {error}
