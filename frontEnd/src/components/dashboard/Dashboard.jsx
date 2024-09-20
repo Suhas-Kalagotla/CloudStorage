@@ -13,13 +13,14 @@ const Dashboard = () => {
         });
       } catch (err) {
         if (err.response && err.response.status === 401) {
-          navigate("/login");
+          navigate("/unauthorized");
+          return;
         }
         console.log(err);
       }
     };
     fetchAllUsers();
-  }, []);
+  });
 
   return <p>this is admin dashboard</p>;
 };

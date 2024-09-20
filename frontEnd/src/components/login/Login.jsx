@@ -6,8 +6,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Login = ({ onFormSwitch }) => {
-  const logout = async (e) => {
-    await axios.post(`${url}/logout`);
+  const logout = async () => {
+    try {
+      const response = await axios.post(`${url}/auth/logout`);
+      console.log(response.status);
+    } catch (err) {
+      console.log(err);
+    }
   };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,16 +41,21 @@ const Login = ({ onFormSwitch }) => {
       return;
     }
     try {
-      const response = await axios.post(`${url}/auth/login`, {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        `${url}/auth/login`,
+        {
+          email,
+          password,
+        },
+        { withCredentials: true },
+      );
+
       localStorage.setItem("user", JSON.stringify(response.data.user));
       const user = JSON.parse(localStorage.getItem("user"));
       if (response.status === 500) {
         setErrors("Server Error");
       } else if (user.role === "admin") {
-        navigate("/admin/dashboard");
+        navigate("/admin");
       } else {
         navigate("/");
       }
