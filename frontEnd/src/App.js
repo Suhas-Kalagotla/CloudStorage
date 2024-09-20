@@ -1,5 +1,11 @@
 import "./App.css";
-import { Home, Login, Register, Dashboard, NotFound,UnAuthorized } from "./components";
+import {
+  Home,
+  Login,
+  Register,
+  Dashboard,
+  ErrorPage,
+} from "./components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 function App() {
@@ -26,8 +32,25 @@ function App() {
           <Route path="/admin">
             <Route path="dashboard" element={<Dashboard />} />
           </Route>
-          <Route path="unauthorized" element={<UnAuthorized />} />
-          <Route path="*" element=<NotFound /> />
+          <Route
+            path="unauthorized"
+            element={
+              <ErrorPage
+                statusCode="401"
+                message="Unauthorized access denied"
+              />
+            }
+          />
+          <Route
+            path="forbidden"
+            element={
+              <ErrorPage statusCode="403" message="Forbidden access denied" />
+            }
+          />
+          <Route
+            path="*"
+            element=<ErrorPage statusCode="404" message="Page not found" />
+          />
         </Routes>
       </Router>
     </div>
