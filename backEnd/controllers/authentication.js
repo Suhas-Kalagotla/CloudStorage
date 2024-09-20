@@ -50,10 +50,9 @@ const login = async (req, res) => {
       res.cookie("token", token, {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite: "lax",
+        sameSite: "none",
         secure: process.env.NODE_ENV === "production",
       });
-
       delete user.password;
       res.status(200).json({
         message: "Login Successfull",
@@ -67,7 +66,7 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.cookie("token", "", {
+  res.cookie("token", "abs", {
     httpOnly: true,
     expires: new Date(0), // Set the cookie to expire immediately
   });

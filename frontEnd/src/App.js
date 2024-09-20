@@ -1,5 +1,5 @@
 import "./App.css";
-import { Home, Login, Register, Dashboard, NotFound } from "./components";
+import { Home, Login, Register, Dashboard, NotFound,UnAuthorized } from "./components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 function App() {
@@ -26,6 +26,7 @@ function App() {
           <Route path="/admin">
             <Route path="dashboard" element={<Dashboard />} />
           </Route>
+          <Route path="unauthorized" element={<UnAuthorized />} />
           <Route path="*" element=<NotFound /> />
         </Routes>
       </Router>
