@@ -6,6 +6,7 @@ import {
   Dashboard,
   ErrorPage,
   Navbar,
+  Upload, 
 } from "./components";
 import {
   BrowserRouter as Router,
@@ -56,6 +57,7 @@ function AppContent() {
         <Route path="/admin">
           <Route path="dashboard" element={<Dashboard />} />
         </Route>
+        <Route path="/upload" element={<Upload />} />
         <Route
           path="unauthorized"
           element={

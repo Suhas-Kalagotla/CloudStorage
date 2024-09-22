@@ -1,4 +1,23 @@
 .navigateButton {
+  background: none;
   padding: 0.25rem;
-  border: inherit;
+  border: none;
+}
+
+.activeNavButton {
+  position: relative;
+  display: inline-block;
+}
+
+.activeNavButton::after {
+  content: "";
+  display: block;
+  width: 80%;
+  height: 2.5px;
+  background-color: blue;
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  transform: translate(-50%);
+  transition: width 0.3s;
 }

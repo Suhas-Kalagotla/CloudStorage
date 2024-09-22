@@ -1,14 +1,16 @@
 .navbarContainer {
   display: flex;
-  justify-content: center;
-  padding: 1rem;
-}
-.navbar {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem auto;
+  padding: 0.75rem;
   border: 1px solid black;
   border-radius: 5px;
-  width: 80%;
-  justify-content: right;
+  width: 90%;
+}
+.navItems {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-grow: 1;
 }
