@@ -2,8 +2,10 @@ import { NavigateButton } from "../util";
 import "./navbar.css";
 import { url } from "../../utils/url";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ user }) => {
+  const navigate = useNavigate();
   const logout = async () => {
     try {
       await axios.post(
@@ -13,6 +15,8 @@ const Navbar = () => {
           withCredentials: true,
         },
       );
+      localStorage.clear();
+      navigate("/login");
     } catch (err) {
       console.log(err);
     }
@@ -22,8 +26,11 @@ const Navbar = () => {
       <div className="navbar">
         <NavigateButton name="Home" url="/" />
         <NavigateButton name="Upload" url="/upload" />
-        <NavigateButton name="Login" url="/login" />
-        <button onClick={() => logout()}> Logout</button>
+        {!user ? (
+          <NavigateButton name="Login" url="/login" />
+        ) : (
+          <button onClick={() => logout()}> Logout</button>
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { url } from "../../utils/url";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Login = ({ onFormSwitch }) => {
+const Login = ({ onFormSwitch ,onLogin}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -42,8 +42,8 @@ const Login = ({ onFormSwitch }) => {
         { withCredentials: true },
       );
 
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      const user = JSON.parse(localStorage.getItem("user"));
+      const user = response.data.user;
+      onLogin(user); 
       if (response.status === 500) {
         setErrors("Server Error");
       } else if (user.role === "admin") {
