@@ -6,19 +6,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Login = ({ onFormSwitch }) => {
-  const logout = async () => {
-    try {
-      const response = await axios.post(
-        `${url}/auth/logout`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -114,7 +101,6 @@ const Login = ({ onFormSwitch }) => {
           Register here
         </button>
       </p>
-      <button onClick={() => logout()}> logout</button>
     </div>
   );
 };
