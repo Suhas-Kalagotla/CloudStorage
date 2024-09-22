@@ -1,0 +1,36 @@
+.storageBarContainer {
+  display: flex;
+  align-items: center;
+  width: 60%;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.animationBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  padding: 3px;
+  font-size: 8px;
+  line-height: 8px;
+  border-radius: 30px;
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.25),
+    0 1px rgba(255, 255, 255, 0.8);
+  height: 5px;
+}
+
+.animationBar span {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 10px 0 0 10px;
+  overflow: hidden;
+  background-color: #0d98ba;
+  height: 100%;
+  width: 0%;
+  animation: progressBar 2s linear;
+}
+
