@@ -1,7 +1,37 @@
 .homeContainer {
-  margin-left: 4%;
-  margin-right: 4%;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 70px);
+  margin-left: 4.2%;
+  margin-right: 4.2%;
 }
+
+.homeHead {
+  flex: 0 0 auto;
+}
+
 .homeBody {
-  width: 100%;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.folderContainer {
+  flex: 5;
+  border-right: 2px solid black;
+}
+
+.folderDataContainer {
+  flex: 2;
+  overflow-y: auto;
+}
+
+.folder {
+  display: inline-flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  cursor: pointer;
+  margin:1rem;
 }

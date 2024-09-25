@@ -1,9 +1,10 @@
 import "./storageBar.css";
 import { useEffect, useState, useCallback } from "react";
 
-const StorageBar = ({ usedStorage, totalStorage }) => {
+const StorageBar = ({ usedStorage, totalStorage, animated }) => {
   const percentage = (usedStorage / totalStorage) * 100;
   const [width, setWidth] = useState(0);
+
   const animation = useCallback(() => {
     let start = 0;
     const step = () => {
@@ -19,9 +20,13 @@ const StorageBar = ({ usedStorage, totalStorage }) => {
   }, [percentage]);
 
   useEffect(() => {
-    setWidth(0);
-    animation();
-  }, [animation]);
+    if (animated) {
+      setWidth(0);
+      animation();
+    } else {
+      setWidth(percentage);
+    }
+  }, []);
 
   return (
     <div className="storageBarContainer">
@@ -29,6 +34,9 @@ const StorageBar = ({ usedStorage, totalStorage }) => {
       <div className="animationBar">
         <span data-label="Memory used" style={{ width: `${width}%` }}></span>
       </div>
+      <p>
+        {usedStorage} / {totalStorage} gb
+      </p>
     </div>
   );
 };
