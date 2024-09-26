@@ -9,6 +9,7 @@ import {
   Upload,
   Users,
 } from "./components";
+import { ProtectedRoute } from "./components/util/ProtectedRoute";
 import {
   BrowserRouter as Router,
   Routes,
@@ -55,13 +56,16 @@ function AppContent() {
             )
           }
         />
-        <Route path="/admin">
+        <Route
+          path="/admin"
+          element={<ProtectedRoute allowedRoles={["admin"]} user={user} />}
+        >
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
         </Route>
         <Route path="/upload" element={<Upload />} />
-    <Route path = "/users" element= {<Users/>}/>
         <Route
-          path="unauthorized"
+          path="/unauthorized"
           element={
             <ErrorPage statusCode="401" message="Unauthorized access denied" />
           }

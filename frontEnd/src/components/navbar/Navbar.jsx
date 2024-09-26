@@ -38,8 +38,8 @@ const Navbar = ({ user }) => {
         {user && user.role === "admin" && (
           <NavigateButton
             name="Users"
-            url="/users"
-            active={isActive("/users")}
+            url="/admin/users"
+            active={isActive("/admin/users")}
           />
         )}
       </div>
