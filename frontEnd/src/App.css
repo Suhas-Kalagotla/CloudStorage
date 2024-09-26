@@ -7,6 +7,10 @@
 body {
   font-size: var(--base-font-size);
 }
+.App { 
+  margin-left : 4.2%; 
+  margin-right:4.2%; 
+} 
 
 * {
   font-size: inherit;

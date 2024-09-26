@@ -35,6 +35,13 @@ const Navbar = ({ user }) => {
           url="/upload"
           active={isActive("/upload")}
         />
+        {user && user.role === "admin" && (
+          <NavigateButton
+            name="Users"
+            url="/users"
+            active={isActive("/users")}
+          />
+        )}
       </div>
       <div className="loginButton">
         {!user ? (

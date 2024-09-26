@@ -5,3 +5,4 @@ export { default as Dashboard } from "./dashboard/Dashboard.jsx";
 export { default as ErrorPage } from "./errorPage/ErrorPage.jsx";
 export { default as Navbar } from "./navbar/Navbar.jsx";
 export { default as Upload } from "./upload/Upload.jsx";
+export { default as Users } from "./users/Users.jsx"; 
