@@ -2,7 +2,7 @@ const db = require("../db.js");
 const { v4: uuidv4 } = require("uuid");
 
 const insertUser = (userName, email, password, role, callback) => {
-  const query = `INSERT IGNORE INTO users (id,userName, email , password,role) VALUES (?, ?, ?, ?, ?)`;
+  const query = `INSERT IGNORE INTO users (id,user_name, email , password,role) VALUES (?, ?, ?, ?, ?)`;
   const id = uuidv4();
 
   db.query(query, [id, userName, email, password, role], (err, result) => {

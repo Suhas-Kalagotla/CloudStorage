@@ -1,4 +1,11 @@
-export const InputField = ({ label, value, onChange, type, placeholder, name }) => (
+export const InputField = ({
+  label,
+  value,
+  onChange,
+  type,
+  placeholder,
+  name,
+}) => (
   <>
     <label htmlFor={name}>{label}</label>
     <div>
