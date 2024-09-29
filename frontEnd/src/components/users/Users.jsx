@@ -6,7 +6,23 @@ import { useNavigate } from "react-router-dom";
 
 const Users = () => {
   const [allUsers, setAllUsers] = useState([]);
-  const [updateUsers, setUpdateUsers] = useState([]); 
+  const [updateUsers, setUpdateUsers] = useState([]);
+
+  const handleRoleChange = (userId, newRole) => {
+    const userIndex = allUsers.findIndex((user) => user.id === userId);
+    if (userIndex !== -1) {
+      if (!updateUsers.includes(userId))
+        setUpdateUsers([...updateUsers, userId]);
+      console.log(updateUsers);
+      const updatedUsers = [...allUsers];
+      updatedUsers[userIndex] = {
+        ...updatedUsers[userIndex],
+        role: newRole,
+      };
+      setAllUsers(updatedUsers);
+    }
+  };
+
   const navigate = useNavigate();
   useEffect(() => {
     const fetchAllUsers = async () => {
@@ -51,7 +67,10 @@ const Users = () => {
               <td> {user.user_name} </td>
               <td> {user.email}</td>
               <td>
-                <select value={user.role}>
+                <select
+                  value={user.role}
+                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
                   <option value="validate">Validate</option>
@@ -60,7 +79,11 @@ const Users = () => {
               <td> {user.used_storage}</td>
               <td> {user.allocated_storage}</td>
               <td>
-                <button className="deleteBtn"> Delete</button>
+                {updateUsers.includes(user.id) ? (
+                  <button> Update </button>
+                ) : (
+                  <button className="deleteBtn"> Delete</button>
+                )}
               </td>
             </tr>
           ))}
