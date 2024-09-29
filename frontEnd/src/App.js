@@ -9,6 +9,7 @@ import {
   Upload,
   Users,
 } from "./components";
+import { Loading } from "./components/util";
 import { ProtectedRoute } from "./components/util/ProtectedRoute";
 import {
   BrowserRouter as Router,
@@ -27,6 +28,8 @@ function AppContent() {
   const location = useLocation();
   const [currentForm, setCurrentForm] = useState("login");
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const hideNavbarPaths = ["/login"];
   const navigate = useNavigate();
 
@@ -35,12 +38,14 @@ function AppContent() {
     if (user) {
       setUser(JSON.parse(user));
     }
+    setLoading(false);
   }, [navigate]);
 
   const handleLogin = (user) => {
     setUser(user);
     localStorage.setItem("user", JSON.stringify(user));
   };
+  if (loading) return <Loading />;
   return (
     <>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar user={user} />}

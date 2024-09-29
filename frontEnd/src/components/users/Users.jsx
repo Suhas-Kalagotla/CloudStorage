@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const Users = () => {
   const [allUsers, setAllUsers] = useState([]);
+  const [updateUsers, setUpdateUsers] = useState([]); 
   const navigate = useNavigate();
   useEffect(() => {
     const fetchAllUsers = async () => {
@@ -31,26 +32,40 @@ const Users = () => {
 
   return (
     <div className="usersContainer">
-        <table>
-          <thead>
-            <tr>
-              <th>ID </th>
-              <th> User Name</th>
-              <th> Email </th>
-              <th> Role </th>
+      <table>
+        <thead>
+          <tr>
+            <th>ID </th>
+            <th> User Name</th>
+            <th> Email </th>
+            <th> Role </th>
+            <th> Used Storage</th>
+            <th> Allocated Storage</th>
+            <th> Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allUsers.map((user, idx) => (
+            <tr key={idx + 1}>
+              <td>{idx + 1} </td>
+              <td> {user.user_name} </td>
+              <td> {user.email}</td>
+              <td>
+                <select value={user.role}>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                  <option value="validate">Validate</option>
+                </select>
+              </td>
+              <td> {user.used_storage}</td>
+              <td> {user.allocated_storage}</td>
+              <td>
+                <button className="deleteBtn"> Delete</button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {allUsers.map((user, idx) => (
-              <tr key={idx + 1}>
-                <td>{idx + 1} </td>
-                <td> {user.userName} </td>
-                <td> {user.email}</td>
-                <td> {user.role} </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

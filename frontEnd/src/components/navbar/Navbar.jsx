@@ -45,9 +45,9 @@ const Navbar = ({ user }) => {
       </div>
       <div className="loginButton">
         {!user ? (
-          <button>
+          <div>
             <NavigateButton name="Login" url="/login" />
-          </button>
+          </div>
         ) : (
           <button onClick={() => logout()}> Logout</button>
         )}

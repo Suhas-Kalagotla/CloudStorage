@@ -4,6 +4,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authenticationRoutes = require("./routes/authenticationRoutes.js");
 const adminRoutes = require("./routes/admin.js");
+const verifyToken = require("./middleware/verifyToken.js");
+const authorizeRole = require("./middleware/authorizeRole.js");
 const app = express();
 require("dotenv").config();
 
@@ -18,7 +20,7 @@ app.use(
 );
 
 app.use("/auth", authenticationRoutes);
-app.use("/admin", adminRoutes);
+app.use("/admin", verifyToken, authorizeRole(["admin"]), adminRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running on port 3001");

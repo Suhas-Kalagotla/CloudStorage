@@ -7,14 +7,18 @@
 body {
   font-size: var(--base-font-size);
 }
-.App { 
-  margin-left : 4.2%; 
-  margin-right:4.2%; 
-} 
+.App {
+  margin-left: 4.2%;
+  margin-right: 4.2%;
+}
 
 * {
   font-size: inherit;
 }
 button {
   cursor: pointer;
+}
+
+.deleteBtn {
+  color: #ff474c;
 }
