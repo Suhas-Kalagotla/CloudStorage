@@ -1,32 +1,51 @@
 const db = require("../db.js");
 const { v4: uuidv4 } = require("uuid");
 
-const insertUser = (userName, email, password, role, callback) => {
+const insertUser = async (userName, email, password, role) => {
   const query = `INSERT IGNORE INTO users (id,user_name, email , password,role) VALUES (?, ?, ?, ?, ?)`;
   const id = uuidv4();
 
-  db.query(query, [id, userName, email, password, role], (err, result) => {
-    if (err) return callback(err);
-    callback(null, result);
+  return new Promise((resolve, reject) => {
+    db.query(query, [id, userName, email, password, role], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
   });
 };
 
-const getUserByEmail = (email, callback) => {
+const getUserByEmail = async (email) => {
   const query = `SELECT * FROM users WHERE email = ? `;
-  db.query(query, [email], (err, result) => {
-    if (err) return callback(err);
-    if (result.length == 0) return callback(null, null);
-    callback(null, result[0]);
+  return new Promise((resolve, reject) => {
+    db.query(query, [email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result.affectedRows ? result[0] : null);
+    });
   });
 };
 
-const getAllUsers = (callback) => {
+const getAllUsers = async () => {
   const query = `SELECT * FROM users`;
-  db.query(query, [], (err, result) => {
-    if (err) return callback(err);
-
-    callback(null, result);
+  return new Promise((resolve, reject) => {
+    db.query(query, [], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
   });
 };
 
-module.exports = { insertUser, getUserByEmail, getAllUsers };
+const updateUserEmailRole = async (role, allocatedStorage, id) => {
+  const query = `UPDATE users SET role=?, allocated_storage=? WHERE id=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [role, allocatedStorage, id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+module.exports = {
+  insertUser,
+  getUserByEmail,
+  getAllUsers,
+  updateUserEmailRole,
+};

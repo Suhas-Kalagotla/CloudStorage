@@ -8,12 +8,26 @@ const Users = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [updateUsers, setUpdateUsers] = useState([]);
 
+  const handleUpdate = async (id, role, allocatedStorage) => {
+    try {
+      const response = await axios.patch(
+        `${url}/admin/updateUser`,
+        { role, allocatedStorage, id },
+        { withCredentials: true },
+      );
+      if (response.status === 200) {
+        setUpdateUsers(updateUsers.filter((id) => id !== response.data.id));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleRoleChange = (userId, newRole) => {
     const userIndex = allUsers.findIndex((user) => user.id === userId);
     if (userIndex !== -1) {
       if (!updateUsers.includes(userId))
         setUpdateUsers([...updateUsers, userId]);
-      console.log(updateUsers);
       const updatedUsers = [...allUsers];
       updatedUsers[userIndex] = {
         ...updatedUsers[userIndex],
@@ -80,7 +94,14 @@ const Users = () => {
               <td> {user.allocated_storage}</td>
               <td>
                 {updateUsers.includes(user.id) ? (
-                  <button> Update </button>
+                  <button
+                    onClick={() =>
+                      handleUpdate(user.id, user.role, user.allocated_storage)
+                    }
+                  >
+                    {" "}
+                    Update{" "}
+                  </button>
                 ) : (
                   <button className="deleteBtn"> Delete</button>
                 )}
