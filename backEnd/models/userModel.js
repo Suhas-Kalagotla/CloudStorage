@@ -18,7 +18,7 @@ const getUserByEmail = async (email) => {
   return new Promise((resolve, reject) => {
     db.query(query, [email], (err, result) => {
       if (err) return reject(err);
-      resolve(result.affectedRows ? result[0] : null);
+      resolve(result.length === 1 ? result[0] : null);
     });
   });
 };

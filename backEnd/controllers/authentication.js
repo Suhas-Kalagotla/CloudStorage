@@ -8,7 +8,7 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
     const role = "validate";
-    const result = await insertUser(userName, email, password, role);
+    const result = await insertUser(userName, email, passwordHash, role);
     if (result.affectedRows === 0) {
       return res
         .status(409)
@@ -26,6 +26,7 @@ const login = async (req, res) => {
   try {
     let { email, password } = req.body;
     const user = await getUserByEmail(email);
+    console.log(user);
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
