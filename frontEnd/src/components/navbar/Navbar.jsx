@@ -30,11 +30,13 @@ const Navbar = ({ user }) => {
     <div className="navbarContainer">
       <div className="navItems">
         <NavigateButton name="Home" url="/" active={isActive("/")} />
-        <NavigateButton
-          name="Upload"
-          url="/upload"
-          active={isActive("/upload")}
-        />
+        {user && user.role !== "validate" && (
+          <NavigateButton
+            name="Upload"
+            url="/upload"
+            active={isActive("/upload")}
+          />
+        )}
         {user && user.role === "admin" && (
           <NavigateButton
             name="Users"

@@ -26,7 +26,7 @@ const StorageBar = ({ usedStorage, totalStorage, animated }) => {
     } else {
       setWidth(percentage);
     }
-  }, []);
+  }, [animated,animation,percentage]);
 
   return (
     <div className="storageBarContainer">

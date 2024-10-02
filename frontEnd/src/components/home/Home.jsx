@@ -4,7 +4,7 @@ import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
 import "./home.css";
 
-const Home = () => {
+const Home = ({ user }) => {
   const [animated, setAnimated] = useState(false);
   const [folders, setFolders] = useState([
     { id: 1, name: "folder 1" },
@@ -20,13 +20,17 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if (!animated) setAnimated(true);
+    if (animated) setAnimated(true);
   }, [animated]);
 
-  return (
+  return user.role !== "validate" ? (
     <div className="homeContainer">
       <div className="homeHead">
-        <StorageBar usedStorage={65} totalStorage={100} animated={animated} />
+        <StorageBar
+          usedStorage={user.used_storage}
+          totalStorage={user.allocated_storage}
+          animated={animated}
+        />
       </div>
       <div className="homeBody">
         <div className="folderContainer">
@@ -43,6 +47,11 @@ const Home = () => {
         </div>
         <div className="folderDataContainer"></div>
       </div>
+    </div>
+  ) : (
+    <div>
+      Pending validation from admin. You can use the features onces it is
+      done.Please wait
     </div>
   );
 };
