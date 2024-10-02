@@ -98,12 +98,12 @@ const Users = () => {
                     onClick={() =>
                       handleUpdate(user.id, user.role, user.allocated_storage)
                     }
+                    className="updateBtn"
                   >
-                    {" "}
-                    Update{" "}
+                    Update
                   </button>
                 ) : (
-                  <button className="deleteBtn"> Delete</button>
+                  <button> Access</button>
                 )}
               </td>
             </tr>

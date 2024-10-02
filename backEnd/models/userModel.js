@@ -43,9 +43,20 @@ const updateUserEmailRole = async (role, allocatedStorage, id) => {
   });
 };
 
+const deleteUserById = async (id) => {
+  const query = `DELETE FROM users WHERE id=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [id], (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
+};
+
 module.exports = {
   insertUser,
   getUserByEmail,
   getAllUsers,
   updateUserEmailRole,
+  deleteUserById,
 };
