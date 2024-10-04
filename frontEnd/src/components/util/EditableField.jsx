@@ -1,17 +1,31 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-export const EditableField = ({ text, editing = false, onEditingComplete }) => {
-  const [isEditing, setIsEditing] = useState(editing);
-  const [value, setValue] = useState(text);
+export const EditableField = ({
+  initialValue,
+  type,
+  onEditingComplete,
+  validate,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState(initialValue);
+  const timeOutRef = useRef(null);
 
   useEffect(() => {
-    setIsEditing(editing);
-    setValue(text);
-  }, [editing, text]);
+    setValue(initialValue);
+  }, [initialValue]);
+
+  const handleEditingComplete = () => {
+    if (validate(value)) onEditingComplete(value);
+    else setValue(initialValue);
+  };
 
   const handleBlur = () => {
+    if (value.length === 0) {
+      setValue(initialValue);
+    } else {
+      handleEditingComplete();
+    }
     setIsEditing(false);
-    onEditingComplete(value);
   };
 
   const handleKeyDown = (event) => {
@@ -20,20 +34,33 @@ export const EditableField = ({ text, editing = false, onEditingComplete }) => {
     }
   };
 
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setValue(newValue);
+    clearTimeout(timeOutRef.current);
+    timeOutRef.current = setTimeout(() => {
+      handleEditingComplete();
+    }, 500);
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(timeOutRef.current);
+  }, []);
+
   return (
     <div>
       {isEditing ? (
         <input
-          type="text"
+          type={type}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => handleChange(e)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           autoFocus
           style={{ width: `${value.length}ch` }}
         />
       ) : (
-        <span >{value}</span>
+        <span onDoubleClick={() => setIsEditing(true)}>{value}</span>
       )}
     </div>
   );

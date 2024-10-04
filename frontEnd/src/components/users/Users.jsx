@@ -3,56 +3,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { url } from "../../utils/url";
 import { useNavigate } from "react-router-dom";
+import { EditableField } from "../util/EditableField";
 
 const Users = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [updateUsers, setUpdateUsers] = useState({});
-
-  const handleUpdate = async (id, role, allocatedStorage) => {
-    try {
-      const response = await axios.patch(
-        `${url}/admin/updateUser`,
-        { role, allocatedStorage, id },
-        { withCredentials: true },
-      );
-      if (response.status === 200) {
-        removeUserFromUpdate(id);
-        fetchAllUsers();
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const removeUserFromUpdate = (userId) => {
-    setUpdateUsers((prevUpdates) => {
-      const { [userId]: removedUser, ...remainingUpdates } = prevUpdates;
-      return remainingUpdates;
-    });
-  };
-
-  const addUserToUpdate = (userId, newRole, allocatedStorage) => {
-    setUpdateUsers((prevChanges) => ({
-      ...prevChanges,
-      [userId]: {
-        ...prevChanges[userId],
-        role: newRole,
-        allocatedStorage: allocatedStorage,
-      },
-    }));
-  };
-
-  const handleRoleChange = async (userId, newRole) => {
-    const originalRole = allUsers.find((user) => user.id === userId)?.role;
-
-    if (newRole === originalRole) {
-      if (updateUsers[userId]) {
-        removeUserFromUpdate(userId);
-      }
-    } else {
-      addUserToUpdate(userId, newRole);
-    }
-  };
 
   const navigate = useNavigate();
 
@@ -63,21 +18,68 @@ const Users = () => {
       });
       setAllUsers(response.data.result);
     } catch (err) {
-      if (err.response && err.response.status === 401) {
+      const status = err?.response?.status;
+      if (status === 401) {
         navigate("/unauthorized");
-        return;
-      }
-      if (err.response && err.response.status === 403) {
+      } else if (status === 403) {
         navigate("/forbidden");
-        return;
+      } else {
+        console.log(err);
       }
-      console.log(err);
     }
   };
 
   useEffect(() => {
     fetchAllUsers();
-  }, [navigate]);
+  }, []);
+
+  const handleUpdate = async (id, role, allocatedStorage) => {
+    try {
+      const response = await axios.patch(
+        `${url}/admin/updateUser`,
+        { id, role, allocatedStorage },
+        { withCredentials: true },
+      );
+      if (response.status === 200) {
+        removeUserFromUpdate(id);
+        fetchAllUsers();
+      }
+    } catch (err) {
+      if (err.status === 501) console.log(err.response.data.error);
+      console.log(err);
+    }
+  };
+
+  const addUserToUpdate = (userId, role, allocated_storage) => {
+    setUpdateUsers((prev) => ({
+      ...prev,
+      [userId]: { role, allocated_storage },
+    }));
+  };
+
+  const removeUserFromUpdate = (userId) => {
+    setUpdateUsers((prev) => {
+      const { [userId]: _, ...remainingUsers } = prev;
+      return remainingUsers;
+    });
+  };
+
+  const validateAllocatedStorage = (value) => {
+    const num = Number(value);
+    if (isNaN(num)) return false;
+    if (num < 0) return false;
+    return true;
+  };
+
+  const handleUserChange = async (userId, newRole, allocatedStorage) => {
+    const user = allUsers.find((user) => user.id === userId);
+
+    if (newRole === user.role && allocatedStorage === user.allocated_storage) {
+      removeUserFromUpdate(userId);
+    } else {
+      addUserToUpdate(userId, newRole, allocatedStorage);
+    }
+  };
 
   return (
     <div className="usersContainer">
@@ -102,7 +104,14 @@ const Users = () => {
               <td>
                 <select
                   defaultValue={user.role}
-                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                  onChange={(e) =>
+                    handleUserChange(
+                      user.id,
+                      e.target.value,
+                      updateUsers[user.id]?.allocated_storage ||
+                        user.allocated_storage,
+                    )
+                  }
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -110,16 +119,28 @@ const Users = () => {
                 </select>
               </td>
               <td> {user.used_storage}</td>
-              <td> {user.allocated_storage}</td>
+              <td>
+                <EditableField
+                  type="text"
+                  initialValue={user.allocated_storage}
+                  onEditingComplete={(newValue) => {
+                    handleUserChange(
+                      user.id,
+                      updateUsers[user.id]?.role || user.role,
+                      Number(newValue),
+                    );
+                  }}
+                  validate={validateAllocatedStorage}
+                />
+              </td>
               <td>
                 {updateUsers[user.id] ? (
                   <button
                     onClick={() =>
                       handleUpdate(
                         user.id,
-                        updateUsers[user.id].role || user.role,
-                        updateUsers[user.id].allocated_storage ||
-                          user.allocated_storage,
+                        updateUsers[user.id].role,
+                        updateUsers[user.id].allocated_storage,
                       )
                     }
                     className="updateBtn"
