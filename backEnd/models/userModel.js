@@ -33,7 +33,7 @@ const getAllUsers = async () => {
   });
 };
 
-const updateUserEmailRole = async (role, allocatedStorage, id) => {
+const updateUserRole = async (role, allocatedStorage, id) => {
   const query = `UPDATE users SET role=?, allocated_storage=? WHERE id=?`;
   return new Promise((resolve, reject) => {
     db.query(query, [role, allocatedStorage, id], (err, result) => {
@@ -57,6 +57,6 @@ module.exports = {
   insertUser,
   getUserByEmail,
   getAllUsers,
-  updateUserEmailRole,
+  updateUserRole,
   deleteUserById,
 };

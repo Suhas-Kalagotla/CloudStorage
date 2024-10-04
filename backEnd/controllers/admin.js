@@ -1,6 +1,6 @@
 const {
   getAllUsers,
-  updateUserEmailRole,
+  updateUserRole,
   deleteUserById,
 } = require("../models/userModel.js");
 
@@ -19,7 +19,9 @@ const getUsers = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { role, allocatedStorage, id } = req.body;
-    const result = await updateUserEmailRole(role, allocatedStorage, id);
+    if (role === null || allocatedStorage === null)
+      return res.status(501).json({ error: "Invalid values" });
+    const result = await updateUserRole(role, allocatedStorage, id);
     if (result.affectedRows === 0) {
       return res.status(501).json({ error: "Failed to update User" });
     }
@@ -42,4 +44,4 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, updateUser,deleteUser };
+module.exports = { getUsers, updateUser, deleteUser };
