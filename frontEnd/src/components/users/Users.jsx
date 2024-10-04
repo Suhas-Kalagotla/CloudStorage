@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const Users = () => {
   const [allUsers, setAllUsers] = useState([]);
-  const [updateUsers, setUpdateUsers] = useState([]);
+  const [updateUsers, setUpdateUsers] = useState({});
 
   const handleUpdate = async (id, role, allocatedStorage) => {
     try {
@@ -16,47 +16,66 @@ const Users = () => {
         { withCredentials: true },
       );
       if (response.status === 200) {
-        setUpdateUsers(updateUsers.filter((id) => id !== response.data.id));
+        removeUserFromUpdate(id);
+        fetchAllUsers();
       }
     } catch (err) {
       console.log(err);
     }
   };
 
-  const handleRoleChange = (userId, newRole) => {
-    const userIndex = allUsers.findIndex((user) => user.id === userId);
-    if (userIndex !== -1) {
-      if (!updateUsers.includes(userId))
-        setUpdateUsers([...updateUsers, userId]);
-      const updatedUsers = [...allUsers];
-      updatedUsers[userIndex] = {
-        ...updatedUsers[userIndex],
+  const removeUserFromUpdate = (userId) => {
+    setUpdateUsers((prevUpdates) => {
+      const { [userId]: removedUser, ...remainingUpdates } = prevUpdates;
+      return remainingUpdates;
+    });
+  };
+
+  const addUserToUpdate = (userId, newRole, allocatedStorage) => {
+    setUpdateUsers((prevChanges) => ({
+      ...prevChanges,
+      [userId]: {
+        ...prevChanges[userId],
         role: newRole,
-      };
-      setAllUsers(updatedUsers);
+        allocatedStorage: allocatedStorage,
+      },
+    }));
+  };
+
+  const handleRoleChange = async (userId, newRole) => {
+    const originalRole = allUsers.find((user) => user.id === userId)?.role;
+
+    if (newRole === originalRole) {
+      if (updateUsers[userId]) {
+        removeUserFromUpdate(userId);
+      }
+    } else {
+      addUserToUpdate(userId, newRole);
     }
   };
 
   const navigate = useNavigate();
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      try {
-        const response = await axios.get(`${url}/admin/getUsers`, {
-          withCredentials: true,
-        });
-        setAllUsers(response.data.result);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          navigate("/unauthorized");
-          return;
-        }
-        if (err.response && err.response.status === 403) {
-          navigate("/forbidden");
-          return;
-        }
-        console.log(err);
+
+  const fetchAllUsers = async () => {
+    try {
+      const response = await axios.get(`${url}/admin/getUsers`, {
+        withCredentials: true,
+      });
+      setAllUsers(response.data.result);
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        navigate("/unauthorized");
+        return;
       }
-    };
+      if (err.response && err.response.status === 403) {
+        navigate("/forbidden");
+        return;
+      }
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
     fetchAllUsers();
   }, [navigate]);
 
@@ -82,7 +101,7 @@ const Users = () => {
               <td> {user.email}</td>
               <td>
                 <select
-                  value={user.role}
+                  defaultValue={user.role}
                   onChange={(e) => handleRoleChange(user.id, e.target.value)}
                 >
                   <option value="user">User</option>
@@ -93,10 +112,15 @@ const Users = () => {
               <td> {user.used_storage}</td>
               <td> {user.allocated_storage}</td>
               <td>
-                {updateUsers.includes(user.id) ? (
+                {updateUsers[user.id] ? (
                   <button
                     onClick={() =>
-                      handleUpdate(user.id, user.role, user.allocated_storage)
+                      handleUpdate(
+                        user.id,
+                        updateUsers[user.id].role || user.role,
+                        updateUsers[user.id].allocated_storage ||
+                          user.allocated_storage,
+                      )
                     }
                     className="updateBtn"
                   >
