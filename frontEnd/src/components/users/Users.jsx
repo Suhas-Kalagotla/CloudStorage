@@ -50,6 +50,18 @@ const Users = () => {
     }
   };
 
+  const handleCreateFolder = async (userName) => {
+    try {
+      const response = await axios.post(
+        `${url}/admin/createFolder`,
+        { userName },
+        { withCredentials: true },
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const addUserToUpdate = (userId, role, allocated_storage) => {
     setUpdateUsers((prev) => ({
       ...prev,
@@ -146,6 +158,10 @@ const Users = () => {
                     className="updateBtn"
                   >
                     Update
+                  </button>
+                ) : user.allocated_storage === 0 ? (
+                  <button onClick={() => handleCreateFolder(user.id)}>
+                    Create
                   </button>
                 ) : (
                   <button> Access</button>

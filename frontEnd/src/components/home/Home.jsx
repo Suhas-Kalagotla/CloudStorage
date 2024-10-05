@@ -19,6 +19,11 @@ const Home = ({ user }) => {
     );
   };
 
+  const nameValidate = (value) => {
+    if (value.length === 0) return false;
+    return true;
+  };
+
   useEffect(() => {
     if (animated) setAnimated(true);
   }, [animated]);
@@ -34,13 +39,14 @@ const Home = ({ user }) => {
       </div>
       <div className="homeBody">
         <div className="folderContainer">
-          {folders.map(({ id, name, editing }) => (
+          {folders.map(({ id, name }) => (
             <div key={id} className="folder">
               <FolderIcon />
               <EditableField
+                initialValue={name}
                 onEditingComplete={(newName) => updateFolderName(id, newName)}
                 text={name}
-                editing={editing}
+                validate={nameValidate}
               />
             </div>
           ))}

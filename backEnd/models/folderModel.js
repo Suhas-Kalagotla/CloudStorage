@@ -1,7 +1,7 @@
 const db = require("../db");
 const { v4: uuidv4 } = require("uuid");
 
-const getFolder = async (name) => {
+const getFolderByName = async (name) => {
   const query = `SELECT * FROM FOLDER WHERE name=?`;
   return new Promise((resolve, reject) => {
     db.query(query, [name], (err, result) => {
@@ -21,7 +21,7 @@ const getAllFolders = async () => {
   });
 };
 
-const createFolder = async (name, parentFolderId, location, size, userId) => {
+const insertFolder = async (name, parentFolderId, location, size, userId) => {
   const query = `INSERT IGNORE INTO table (id,name,parent_folder_id,location,size,user_id) VALUES (?,?,?,?,?,?)`;
   const id = uuidv4();
   return new Promise((resolve, reject) => {
@@ -36,4 +36,4 @@ const createFolder = async (name, parentFolderId, location, size, userId) => {
   });
 };
 
-module.export = { getFolder, getAllFolders, createFolder };
+module.exports = { getFolderByName, getAllFolders, insertFolder };
