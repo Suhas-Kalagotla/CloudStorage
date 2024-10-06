@@ -1,7 +1,9 @@
+const { updateFolderSize } = require("../models/folderModel.js");
 const {
   getAllUsers,
   updateUserRole,
   deleteUserById,
+  getUserById,
 } = require("../models/userModel.js");
 
 const getUsers = async (req, res) => {
@@ -19,8 +21,21 @@ const getUsers = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { role, allocatedStorage, id } = req.body;
+
     if (role === null || allocatedStorage === null)
       return res.status(501).json({ error: "Invalid values" });
+
+    const user = await getUserById(id);
+
+    const folderResponse = await updateFolderSize(
+      user.user_name,
+      allocatedStorage,
+    );
+
+    if (folderResponse.affectedRows === 0) {
+      return res.status(501).json({ error: "Failed to update size of folder" });
+    }
+
     const result = await updateUserRole(role, allocatedStorage, id);
     if (result.affectedRows === 0) {
       return res.status(501).json({ error: "Failed to update User" });

@@ -48,9 +48,20 @@ const getRootFolder = () => {
   });
 };
 
+const updateFolderSize = (name, size) => {
+  const query = `UPDATE folder SET size=? WHERE name=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [size, name], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
 module.exports = {
   getFolderByName,
   getAllFolders,
   insertFolder,
   getRootFolder,
+  updateFolderSize,
 };

@@ -46,8 +46,8 @@ const Login = ({ onFormSwitch, onLogin }) => {
       onLogin(user);
       if (response.status === 500) {
         setErrors("Server Error");
-      } else if (user.role === "admin") {
-        navigate("/admin");
+      } else if (user.role === "validate") {
+        navigate("/landing");
       } else {
         navigate("/");
       }

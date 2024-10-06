@@ -8,6 +8,7 @@ import {
   Navbar,
   Upload,
   Users,
+  Landing,
 } from "./components";
 import { Loading } from "./components/util";
 import { ProtectedRoute } from "./components/util/ProtectedRoute";
@@ -50,7 +51,9 @@ function AppContent() {
     <>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar user={user} />}
       <Routes>
-        <Route path="/" element={<Home user = {user}/>} />
+        <Route element={<ProtectedRoute allowedRoles={["user","admin"]} user={user} />}>
+          <Route path="/" element={<Home user={user} />} />
+        </Route>
         <Route
           path="/login"
           element={
@@ -68,6 +71,7 @@ function AppContent() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
         </Route>
+        <Route path="/landing" element={<Landing />} />
         <Route path="/upload" element={<Upload />} />
         <Route
           path="/unauthorized"

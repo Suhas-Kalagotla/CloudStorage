@@ -23,6 +23,16 @@ const getUserByEmail = (email) => {
   });
 };
 
+const getUserById = (id) => {
+  const query = `SELECT id,user_name,email,role,used_storage,allocated_storage,created_at FROM users WHERE id= ? `;
+  return new Promise((resolve, reject) => {
+    db.query(query, [id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result.length === 1 ? result[0] : null);
+    });
+  });
+};
+
 const getAllUsers = () => {
   const query = `SELECT id,user_name,email,role,used_storage,allocated_storage,created_at FROM users`;
   return new Promise((resolve, reject) => {
@@ -66,6 +76,7 @@ const updateUserAllocatedStorage = (id, size) => {
 module.exports = {
   insertUser,
   getUserByEmail,
+  getUserById,
   getAllUsers,
   updateUserRole,
   deleteUserById,

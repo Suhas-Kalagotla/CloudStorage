@@ -29,13 +29,22 @@ const Navbar = ({ user }) => {
   return (
     <div className="navbarContainer">
       <div className="navItems">
-        <NavigateButton name="Home" url="/" active={isActive("/")} />
+    {user && user.role === "validate" && (
+        <NavigateButton
+          name="Landing"
+          url="/landing"
+          active={isActive("/landing")}
+        />
+    )}
         {user && user.role !== "validate" && (
-          <NavigateButton
-            name="Upload"
-            url="/upload"
-            active={isActive("/upload")}
-          />
+          <>
+            <NavigateButton name="Home" url="/" active={isActive("/")} />
+            <NavigateButton
+              name="Upload"
+              url="/upload"
+              active={isActive("/upload")}
+            />
+          </>
         )}
         {user && user.role === "admin" && (
           <NavigateButton

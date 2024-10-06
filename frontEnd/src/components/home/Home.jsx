@@ -28,37 +28,34 @@ const Home = ({ user }) => {
     if (animated) setAnimated(true);
   }, [animated]);
 
-  return user?.role !== "validate" ? (
-    <div className="homeContainer">
-      <div className="homeHead">
-        <StorageBar
-          usedStorage={user?.used_storage}
-          totalStorage={user?.allocated_storage}
-          animated={animated}
-        />
-      </div>
-      <div className="homeBody">
-        <div className="folderContainer">
-          {folders.map(({ id, name }) => (
-            <div key={id} className="folder">
-              <FolderIcon />
-              <EditableField
-                initialValue={name}
-                onEditingComplete={(newName) => updateFolderName(id, newName)}
-                text={name}
-                validate={nameValidate}
-              />
-            </div>
-          ))}
+  return (
+    <>
+      <div className="homeContainer">
+        <div className="homeHead">
+          <StorageBar
+            usedStorage={user?.used_storage}
+            totalStorage={user?.allocated_storage}
+            animated={animated}
+          />
         </div>
-        <div className="folderDataContainer"></div>
+        <div className="homeBody">
+          <div className="folderContainer">
+            {folders.map(({ id, name }) => (
+              <div key={id} className="folder">
+                <FolderIcon />
+                <EditableField
+                  initialValue={name}
+                  onEditingComplete={(newName) => updateFolderName(id, newName)}
+                  text={name}
+                  validate={nameValidate}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="folderDataContainer"></div>
+        </div>
       </div>
-    </div>
-  ) : (
-    <div>
-      Pending validation from admin. You can use the features onces it is
-      done.Please wait
-    </div>
+    </>
   );
 };
 
