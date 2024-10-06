@@ -24,7 +24,7 @@ const getUserByEmail = async (email) => {
 };
 
 const getAllUsers = async () => {
-  const query = `SELECT * FROM users`;
+  const query = `SELECT id,user_name,email,role,used_storage,allocated_storage,created_at FROM users`;
   return new Promise((resolve, reject) => {
     db.query(query, [], (err, result) => {
       if (err) return reject(err);
@@ -47,7 +47,17 @@ const deleteUserById = async (id) => {
   const query = `DELETE FROM users WHERE id=?`;
   return new Promise((resolve, reject) => {
     db.query(query, [id], (err, result) => {
-      if (err) reject(err);
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+const updateUserAllocatedStorage = async (id, size) => {
+  const query = `UPDATE users SET allocated_storage=? WHERE id=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [size, id], (err, result) => {
+      if (err) return reject(err);
       resolve(result);
     });
   });
@@ -59,4 +69,5 @@ module.exports = {
   getAllUsers,
   updateUserRole,
   deleteUserById,
+  updateUserAllocatedStorage,
 };

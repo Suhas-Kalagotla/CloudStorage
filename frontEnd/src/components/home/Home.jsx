@@ -28,12 +28,12 @@ const Home = ({ user }) => {
     if (animated) setAnimated(true);
   }, [animated]);
 
-  return user.role !== "validate" ? (
+  return user?.role !== "validate" ? (
     <div className="homeContainer">
       <div className="homeHead">
         <StorageBar
-          usedStorage={user.used_storage}
-          totalStorage={user.allocated_storage}
+          usedStorage={user?.used_storage}
+          totalStorage={user?.allocated_storage}
           animated={animated}
         />
       </div>

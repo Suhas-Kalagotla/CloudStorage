@@ -50,13 +50,14 @@ const Users = () => {
     }
   };
 
-  const handleCreateFolder = async (userName) => {
+  const handleCreateFolder = async (user) => {
     try {
       const response = await axios.post(
-        `${url}/admin/createFolder`,
-        { userName },
+        `${url}/admin/createUserFolder`,
+        { user },
         { withCredentials: true },
       );
+      if (response.status === 201) fetchAllUsers();
     } catch (err) {
       console.log(err);
     }
@@ -160,7 +161,7 @@ const Users = () => {
                     Update
                   </button>
                 ) : user.allocated_storage === 0 ? (
-                  <button onClick={() => handleCreateFolder(user.id)}>
+                  <button onClick={() => handleCreateFolder(user)}>
                     Create
                   </button>
                 ) : (
