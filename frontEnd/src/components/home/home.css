@@ -5,7 +5,10 @@
 }
 
 .homeHead {
-  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
 }
 
 .homeBody {
@@ -31,5 +34,5 @@
   align-items: center;
   width: auto;
   cursor: pointer;
-  margin:1rem;
+  margin: 1rem;
 }

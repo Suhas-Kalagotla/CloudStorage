@@ -15,7 +15,7 @@ const Home = ({ user }) => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        console.log(response.data.result);
+        console.log(response.data.folders);
       }
     } catch (err) {
       console.log(err);
@@ -49,6 +49,7 @@ const Home = ({ user }) => {
             totalStorage={user?.allocated_storage}
             animated={animated}
           />
+          <button>create folder</button>
         </div>
         <div className="homeBody">
           <div className="folderContainer">
