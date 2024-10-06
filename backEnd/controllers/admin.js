@@ -1,10 +1,16 @@
-const { updateFolderSize } = require("../models/folderModel.js");
+const {
+  updateFolderSize,
+  insertFolder,
+  getRootFolder,
+} = require("../models/folderModel.js");
 const {
   getAllUsers,
   updateUserRole,
   deleteUserById,
   getUserById,
+  updateUserAllocatedStorage,
 } = require("../models/userModel.js");
+const { mkdirFolder } = require("../utils/folderUtils.js");
 
 const getUsers = async (req, res) => {
   try {
@@ -21,7 +27,6 @@ const getUsers = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { role, allocatedStorage, id } = req.body;
-
     if (role === null || allocatedStorage === null)
       return res.status(501).json({ error: "Invalid values" });
 
@@ -59,4 +64,40 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, updateUser, deleteUser };
+const createUserFolder = async (req, res) => {
+  try {
+    const { user } = req.body;
+    let { id, user_name, size } = user;
+
+    const root = await getRootFolder();
+
+    const creatingFolder = await mkdirFolder(root.location, user_name);
+    if (!size || size === 0) {
+      size = 15;
+    }
+
+    const result = await insertFolder(
+      user_name,
+      root.id,
+      creatingFolder.folderPath,
+      size,
+      id,
+    );
+    const updateResult = await updateUserAllocatedStorage(id, size);
+
+    if (!result || result.affectedRows === 0) {
+      return res.status(409).json({ error: "User Folder already created" });
+    }
+
+    if (!updateResult || updateResult.affectedRows === 0) {
+      return res
+        .status(409)
+        .json({ error: "Failed to update user's allocated storage" });
+    }
+    res.status(201).json({ message: "User Folder Created Successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Database Error " + err.message });
+  }
+};
+
+module.exports = { getUsers, updateUser, deleteUser ,createUserFolder};

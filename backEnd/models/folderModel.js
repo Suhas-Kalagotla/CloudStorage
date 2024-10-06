@@ -2,9 +2,19 @@ const db = require("../db");
 const { v4: uuidv4 } = require("uuid");
 
 const getFolderByName = (name) => {
-  const query = `SELECT * FROM FOLDER WHERE name=?`;
+  const query = `SELECT * FROM folder WHERE name=?`;
   return new Promise((resolve, reject) => {
     db.query(query, [name], (err, result) => {
+      if (err) return reject(err);
+      resolve(result.length === 1 ? result[0] : null);
+    });
+  });
+};
+
+const getFoldersByParentId = (id) => {
+  const query = `SELECT * FROM folder WHERE parent_folder_id=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [id], (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
@@ -12,7 +22,7 @@ const getFolderByName = (name) => {
 };
 
 const getAllFolders = () => {
-  const query = `SELECT * FROM FOLDER`;
+  const query = `SELECT * FROM folder`;
   return new Promise((resolve, reject) => {
     db.query(query, [], (err, result) => {
       if (err) return reject(err);
@@ -64,4 +74,5 @@ module.exports = {
   insertFolder,
   getRootFolder,
   updateFolderSize,
+  getFoldersByParentId,
 };

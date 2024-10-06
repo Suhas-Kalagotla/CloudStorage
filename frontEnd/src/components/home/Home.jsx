@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from "react";
-
+import axios from "axios";
+import { url } from "../../utils/url";
 import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
 import "./home.css";
 
 const Home = ({ user }) => {
   const [animated, setAnimated] = useState(false);
-  const [folders, setFolders] = useState([
-    { id: 1, name: "folder 1" },
-    { id: 2, name: "folder 2" },
-  ]);
+  const [folders, setFolders] = useState([]);
+
+  const getFolders = async () => {
+    try {
+      const response = await axios.get(`${url}/user/getFolders`, {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        console.log(response.data.result);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const updateFolderName = (id, newName) => {
     setFolders((prevFolders) =>
@@ -26,6 +37,7 @@ const Home = ({ user }) => {
 
   useEffect(() => {
     if (animated) setAnimated(true);
+    getFolders();
   }, [animated]);
 
   return (
