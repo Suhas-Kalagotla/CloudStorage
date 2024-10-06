@@ -1,5 +1,6 @@
 const { insertFolder, getRootFolder } = require("../models/folderModel.js");
 const { updateUserAllocatedStorage } = require("../models/userModel.js");
+const { mkdirFolder } = require("../utils/folderUtils.js");
 
 const createFolder = async (req, res) => {
   try {
@@ -28,14 +29,21 @@ const createUserFolder = async (req, res) => {
   try {
     const { user } = req.body;
     let { id, user_name, size } = user;
+
     const root = await getRootFolder();
 
-    const location = `${root.location}/${user_name}`;
+    const creatingFolder = await mkdirFolder(root.location, user_name);
     if (!size || size === 0) {
       size = 15;
     }
 
-    const result = await insertFolder(user_name, root.id, location, size, id);
+    const result = await insertFolder(
+      user_name,
+      root.id,
+      creatingFolder.folderPath,
+      size,
+      id,
+    );
     const updateResult = await updateUserAllocatedStorage(id, size);
 
     if (!result || result.affectedRows === 0) {
