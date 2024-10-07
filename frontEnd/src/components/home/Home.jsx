@@ -15,7 +15,7 @@ const Home = ({ user }) => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        console.log(response.data.folders);
+        setFolders(response.data.folders);
       }
     } catch (err) {
       console.log(err);
