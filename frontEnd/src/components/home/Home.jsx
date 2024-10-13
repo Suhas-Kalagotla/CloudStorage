@@ -25,9 +25,10 @@ const Home = ({ user }) => {
 
   const createFolder = async (newName) => {
     try {
+      const parentId = user.id;
       const response = await axios.post(
         `${url}/user/createFolder`,
-        { user, newName },
+        { newName, parentId },
         {
           withCredentials: true,
         },
@@ -41,22 +42,36 @@ const Home = ({ user }) => {
     }
   };
 
+  const generateUniqueFolderName = (baseName) => {
+    let name = baseName;
+    let count = 1;
+    const folderName = folders.map((folder) => folder.name);
+    while (folderName.includes(name)) {
+      name = `${baseName} ${count}`;
+      count++;
+    }
+    return name;
+  };
+
   const handleCreateFolder = async () => {
+    const baseName = "New Folder";
+    const uniqueName = generateUniqueFolderName(baseName);
     const newFolder = {
       id: Date.now(),
-      name: "New Folder",
+      name: uniqueName,
     };
     setFolders((prevFolders) => [...prevFolders, newFolder]);
     SetEditingFolderId(newFolder.id);
   };
 
   const updateFolderName = (id, newName) => {
+    const uniqueName = generateUniqueFolderName(newName);
+
     setFolders((prevFolders) =>
       prevFolders.map((folder) =>
-        folder.id === id ? { ...folder, name: newName } : folder,
+        folder.id === id ? { ...folder, name: uniqueName } : folder,
       ),
     );
-    createFolder(newName);
   };
 
   const nameValidate = (value) => {
