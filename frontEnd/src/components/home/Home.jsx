@@ -8,6 +8,7 @@ import "./home.css";
 const Home = ({ user }) => {
   const [animated, setAnimated] = useState(false);
   const [folders, setFolders] = useState([]);
+  const [editingFolderId, SetEditingFolderId] = useState(null);
 
   const getFolders = async () => {
     try {
@@ -22,12 +23,40 @@ const Home = ({ user }) => {
     }
   };
 
+  const createFolder = async (newName) => {
+    try {
+      const response = await axios.post(
+        `${url}/user/createFolder`,
+        { user, newName },
+        {
+          withCredentials: true,
+        },
+      );
+      if (response.status === 200) {
+        getFolders();
+        console.log(response);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleCreateFolder = async () => {
+    const newFolder = {
+      id: Date.now(),
+      name: "New Folder",
+    };
+    setFolders((prevFolders) => [...prevFolders, newFolder]);
+    SetEditingFolderId(newFolder.id);
+  };
+
   const updateFolderName = (id, newName) => {
     setFolders((prevFolders) =>
       prevFolders.map((folder) =>
         folder.id === id ? { ...folder, name: newName } : folder,
       ),
     );
+    createFolder(newName);
   };
 
   const nameValidate = (value) => {
@@ -49,7 +78,7 @@ const Home = ({ user }) => {
             totalStorage={user?.allocated_storage}
             animated={animated}
           />
-          <button>create folder</button>
+          <button onClick={handleCreateFolder}>create folder</button>
         </div>
         <div className="homeBody">
           <div className="folderContainer">
@@ -61,6 +90,7 @@ const Home = ({ user }) => {
                   onEditingComplete={(newName) => updateFolderName(id, newName)}
                   text={name}
                   validate={nameValidate}
+                  isEditing={editingFolderId === id}
                 />
               </div>
             ))}

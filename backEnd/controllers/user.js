@@ -19,17 +19,9 @@ const getFolders = async (req, res) => {
 
 const createFolder = async (req, res) => {
   try {
-    const { user } = req.body;
-    let { id, user_name, parent_folder_id, location, size } = user;
-    const result = await insertFolder(
-      user_name,
-      parent_folder_id,
-      location,
-      size,
-      id,
-    );
+    const { user, newName } = req.body;
 
-    if (result.affectedRows === 0) {
+    if (newName.length === 0) {
       return res
         .status(409)
         .json({ error: "Folder with this name already exists" });
