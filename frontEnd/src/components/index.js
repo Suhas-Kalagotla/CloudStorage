@@ -8,3 +8,4 @@ export { default as Upload } from "./upload/Upload.jsx";
 export { default as Users } from "./users/Users.jsx";
 export { default as Storage } from "./storage/Storage.jsx";
 export { default as Landing } from "./Landing.jsx";
+export { default as Folders } from "./folders/Folders.jsx";

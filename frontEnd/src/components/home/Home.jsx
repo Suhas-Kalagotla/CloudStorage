@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { url } from "../../utils/url";
 import { FolderIcon, EditableField } from "../util";
@@ -11,6 +11,9 @@ const Home = ({ user }) => {
   const [folders, setFolders] = useState([]);
   const [tempFolder, setTempFolder] = useState(null);
   const [popupMessage, setPopupMessage] = useState(null);
+  const [activeFolderId, setActiveFolderId] = useState(null);
+
+  const folderContainerRef = useRef(null);
 
   const getFolders = async () => {
     try {
@@ -28,13 +31,14 @@ const Home = ({ user }) => {
   const createFolderApi = async (newName) => {
     try {
       const parentId = user.id;
-      await axios.post(
+      const response = await axios.post(
         `${url}/user/createFolder`,
         { newName, parentId },
         {
           withCredentials: true,
         },
       );
+      setActiveFolderId(response.data.folderId);
       setTempFolder(null);
       getFolders();
     } catch (err) {
@@ -51,15 +55,28 @@ const Home = ({ user }) => {
         { id, folderName },
         { withCredentials: true },
       );
+      getFolders();
     } catch (err) {
+      getFolders();
       console.log(err);
     }
   };
 
-  const generateUniqueFolderName = (baseName) => {
+  const handleNameOfNewFolder = (newName) => {
+    const uniqueName = generateUniqueFolderName(newName);
+    console.log(uniqueName);
+    createFolderApi(uniqueName);
+  };
+
+  const generateUniqueFolderName = (baseName, id = null) => {
     let name = baseName;
     let count = 1;
-    const folderName = folders.map((folder) => folder.name);
+    let folderName;
+    if (id)
+      folderName = folders
+        .filter((folder) => folder.id !== id)
+        .map((folder) => folder.name);
+    else folderName = folders.map((folder) => folder.name);
 
     while (folderName.includes(name)) {
       name = `${baseName} ${count}`;
@@ -69,7 +86,7 @@ const Home = ({ user }) => {
   };
 
   const handleCreateFolder = () => {
-    const baseName = "New Folder";
+    let baseName = "New Folder";
     const id = "f6cfa0cb7dcff8389b4ffe234c3893d8bce7c7";
     const uniqueName = generateUniqueFolderName(baseName);
     const newFolder = {
@@ -80,7 +97,7 @@ const Home = ({ user }) => {
   };
 
   const updateFolderName = (id, newName) => {
-    const uniqueName = generateUniqueFolderName(newName);
+    const uniqueName = generateUniqueFolderName(newName, id);
 
     setFolders((prevFolders) =>
       prevFolders.map((folder) =>
@@ -95,6 +112,19 @@ const Home = ({ user }) => {
     return true;
   };
 
+  useEffect(() => {
+    const handleClickOutSide = (event) => {
+      if (
+        folderContainerRef.current &&
+        !folderContainerRef.current.contains(event.target)
+      )
+        setActiveFolderId(null);
+    };
+    document.addEventListener("mousedown", handleClickOutSide);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutSide);
+    };
+  }, []);
   useEffect(() => {
     if (animated) setAnimated(true);
     getFolders();
@@ -112,9 +142,14 @@ const Home = ({ user }) => {
           <button onClick={handleCreateFolder}>create folder</button>
         </div>
         <div className="homeBody">
-          <div className="folderContainer">
+          <div className="folderContainer" >
             {folders.map(({ id, name }) => (
-              <div key={id} className="folder">
+              <div
+                key={id}
+                className={`folder ${activeFolderId === id ? "active" : ""} `}
+                onClick={() => setActiveFolderId(id)}
+ref={folderContainerRef}
+              >
                 <FolderIcon />
                 <EditableField
                   initialValue={name}
@@ -130,8 +165,10 @@ const Home = ({ user }) => {
                 <FolderIcon />
                 <EditableField
                   initialValue={tempFolder.name}
-                  onEditingComplete={(newName) => createFolderApi(newName)}
-                  text={"text"}
+                  onEditingComplete={(newName) =>
+                    handleNameOfNewFolder(newName)
+                  }
+                  type={"text"}
                   validate={nameValidate}
                   isEditing={true}
                 />

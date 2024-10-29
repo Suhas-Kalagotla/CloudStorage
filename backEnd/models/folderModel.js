@@ -52,7 +52,7 @@ const insertFolder = (name, parentFolderId, location, size, userId) => {
         if (err) {
           return reject(err);
         }
-        resolve(result);
+        resolve({result, id});
       },
     );
   });
@@ -78,10 +78,10 @@ const updateFolderSize = (name, size) => {
   });
 };
 
-const updateFolderNameDB = (id, name) => {
-  const query = `UPDATE folder SET name=? WHERE id=?`;
+const updateFolderNameDB = (id, name, location) => {
+  const query = `UPDATE folder SET name=?, location=?  WHERE id=?`;
   return new Promise((resolve, reject) => {
-    db.query(query, [name, id], (err, result) => {
+    db.query(query, [name, location, id], (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });

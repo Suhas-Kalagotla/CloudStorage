@@ -48,7 +48,9 @@ const createFolder = async (req, res) => {
         .json({ error: "Folder with this name already exists" });
     }
 
-    res.status(201).json({ message: "Folder created successfully" });
+    res
+      .status(201)
+      .json({ message: "Folder created successfully", folderId: result.id });
   } catch (err) {
     res.status(500).json({ error: "Database Error " + err.message });
   }
@@ -65,11 +67,17 @@ const updateFolderName = async (req, res) => {
     if (!updateFolder) {
       res.status(409).json({ error: "Failed to rename folder" });
     }
-    const updateFolderMetaData = await updateFolderNameDB(id, folderName);
+
+    const updateFolderMetaData = await updateFolderNameDB(
+      id,
+      folderName,
+      updateFolder,
+    );
+
     if (!updateFolderMetaData) {
       res.status(409).json({ error: "Failed to rename folder" });
     }
-    res.status(200).json({message:"Folder created successfully"}); 
+    res.status(200).json({ message: "Folder created successfully" });
   } catch (err) {
     res.status(500).json({ error: "Database Error " + err.message });
   }
