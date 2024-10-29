@@ -4,12 +4,13 @@ import { url } from "../../utils/url";
 import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
 import "./home.css";
+import PopUp from "../popup/popup.js";
 
 const Home = ({ user }) => {
   const [animated, setAnimated] = useState(false);
   const [folders, setFolders] = useState([]);
-  const [editingFolderId, SetEditingFolderId] = useState(null);
   const [tempFolder, setTempFolder] = useState(null);
+  const [popupMessage, setPopupMessage] = useState(null);
 
   const getFolders = async () => {
     try {
@@ -37,6 +38,7 @@ const Home = ({ user }) => {
       setTempFolder(null);
       getFolders();
     } catch (err) {
+      setPopupMessage("Failed to Create Folder");
       setTempFolder(null);
       console.log(err);
     }
@@ -119,7 +121,7 @@ const Home = ({ user }) => {
                   onEditingComplete={(newName) => updateFolderName(id, newName)}
                   type={"text"}
                   validate={nameValidate}
-                  isEditing={editingFolderId === id}
+                  idEditing={true}
                 />
               </div>
             ))}
@@ -139,6 +141,9 @@ const Home = ({ user }) => {
           <div className="folderDataContainer"></div>
         </div>
       </div>
+      {popupMessage !== null && (
+        <PopUp message={popupMessage} onClose={() => setPopupMessage(null)} />
+      )}
     </>
   );
 };
