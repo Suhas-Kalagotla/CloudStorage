@@ -27,7 +27,7 @@
   overflow-y: auto;
 }
 
-.folder {
+.folder, .tempFolder {
   display: inline-flex;
   justify-content: center;
   flex-direction: column;

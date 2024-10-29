@@ -9,6 +9,7 @@ const Home = ({ user }) => {
   const [animated, setAnimated] = useState(false);
   const [folders, setFolders] = useState([]);
   const [editingFolderId, SetEditingFolderId] = useState(null);
+  const [tempFolder, setTempFolder] = useState(null);
 
   const getFolders = async () => {
     try {
@@ -23,20 +24,31 @@ const Home = ({ user }) => {
     }
   };
 
-  const createFolder = async (newName) => {
+  const createFolderApi = async (newName) => {
     try {
       const parentId = user.id;
-      const response = await axios.post(
+      await axios.post(
         `${url}/user/createFolder`,
         { newName, parentId },
         {
           withCredentials: true,
         },
       );
-      if (response.status === 200) {
-        getFolders();
-        console.log(response);
-      }
+      setTempFolder(null);
+      getFolders();
+    } catch (err) {
+      setTempFolder(null);
+      console.log(err);
+    }
+  };
+
+  const updateFolderNameApi = async (folderName, id) => {
+    try {
+      await axios.patch(
+        `${url}/user/updateName`,
+        { id, folderName },
+        { withCredentials: true },
+      );
     } catch (err) {
       console.log(err);
     }
@@ -46,6 +58,7 @@ const Home = ({ user }) => {
     let name = baseName;
     let count = 1;
     const folderName = folders.map((folder) => folder.name);
+
     while (folderName.includes(name)) {
       name = `${baseName} ${count}`;
       count++;
@@ -53,15 +66,15 @@ const Home = ({ user }) => {
     return name;
   };
 
-  const handleCreateFolder = async () => {
+  const handleCreateFolder = () => {
     const baseName = "New Folder";
+    const id = "f6cfa0cb7dcff8389b4ffe234c3893d8bce7c7";
     const uniqueName = generateUniqueFolderName(baseName);
     const newFolder = {
-      id: Date.now(),
+      id: id,
       name: uniqueName,
     };
-    setFolders((prevFolders) => [...prevFolders, newFolder]);
-    SetEditingFolderId(newFolder.id);
+    setTempFolder(newFolder);
   };
 
   const updateFolderName = (id, newName) => {
@@ -72,6 +85,7 @@ const Home = ({ user }) => {
         folder.id === id ? { ...folder, name: uniqueName } : folder,
       ),
     );
+    updateFolderNameApi(uniqueName, id);
   };
 
   const nameValidate = (value) => {
@@ -103,12 +117,24 @@ const Home = ({ user }) => {
                 <EditableField
                   initialValue={name}
                   onEditingComplete={(newName) => updateFolderName(id, newName)}
-                  text={name}
+                  type={"text"}
                   validate={nameValidate}
                   isEditing={editingFolderId === id}
                 />
               </div>
             ))}
+            {tempFolder && (
+              <div className="tempFolder">
+                <FolderIcon />
+                <EditableField
+                  initialValue={tempFolder.name}
+                  onEditingComplete={(newName) => createFolderApi(newName)}
+                  text={"text"}
+                  validate={nameValidate}
+                  isEditing={true}
+                />
+              </div>
+            )}
           </div>
           <div className="folderDataContainer"></div>
         </div>
