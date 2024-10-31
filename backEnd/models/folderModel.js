@@ -11,8 +11,18 @@ const getFolderByName = (name) => {
   });
 };
 
+const getFolderById = (id) => {
+  const query = `SELECT * FROM folder WHERE id=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result.length === 1 ? result[0] : null);
+    });
+  });
+};
+
 const getFoldersByParentId = (id) => {
-  const query = `SELECT * FROM folder WHERE parent_folder_id=?`;
+  const query = `SELECT id,name,size FROM folder WHERE parent_folder_id=?`;
   return new Promise((resolve, reject) => {
     db.query(query, [id], (err, result) => {
       if (err) return reject(err);
@@ -42,7 +52,7 @@ const insertFolder = (name, parentFolderId, location, size, userId) => {
         if (err) {
           return reject(err);
         }
-        resolve(result);
+        resolve({result, id});
       },
     );
   });
@@ -68,11 +78,23 @@ const updateFolderSize = (name, size) => {
   });
 };
 
+const updateFolderNameDB = (id, name, location) => {
+  const query = `UPDATE folder SET name=?, location=?  WHERE id=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [name, location, id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
 module.exports = {
   getFolderByName,
   getAllFolders,
-  insertFolder,
   getRootFolder,
-  updateFolderSize,
   getFoldersByParentId,
+  getFolderById,
+  insertFolder,
+  updateFolderSize,
+  updateFolderNameDB,
 };

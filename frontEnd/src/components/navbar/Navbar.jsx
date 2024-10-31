@@ -29,13 +29,13 @@ const Navbar = ({ user }) => {
   return (
     <div className="navbarContainer">
       <div className="navItems">
-    {user && user.role === "validate" && (
-        <NavigateButton
-          name="Landing"
-          url="/landing"
-          active={isActive("/landing")}
-        />
-    )}
+        {user && user.role === "validate" && (
+          <NavigateButton
+            name="Landing"
+            url="/landing"
+            active={isActive("/landing")}
+          />
+        )}
         {user && user.role !== "validate" && (
           <>
             <NavigateButton name="Home" url="/" active={isActive("/")} />
@@ -47,11 +47,18 @@ const Navbar = ({ user }) => {
           </>
         )}
         {user && user.role === "admin" && (
+          <>
           <NavigateButton
             name="Users"
             url="/admin/users"
             active={isActive("/admin/users")}
           />
+          <NavigateButton
+          name="Folders"
+          url="/admin/folders"
+          active={isActive("/admin/folders")}
+          />
+          </>
         )}
       </div>
       <div className="loginButton">

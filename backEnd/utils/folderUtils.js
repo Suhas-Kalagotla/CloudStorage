@@ -21,6 +21,23 @@ const mkdirFolder = (rootFolder, folderName) => {
   });
 };
 
+const renameFolder = (folderPath, newName) => {
+  return new Promise((resolve, reject) => {
+    const pathParts = folderPath.split("/");
+    pathParts[pathParts.length - 1] = newName;
+    const newPath = pathParts.join("/");
+
+    fs.rename(folderPath, newPath, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(newPath);
+      }
+    });
+  });
+};
+
 module.exports = {
   mkdirFolder,
+  renameFolder,
 };

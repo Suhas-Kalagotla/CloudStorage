@@ -5,26 +5,25 @@ export const EditableField = ({
   type,
   onEditingComplete,
   validate,
+  isEditing: editingValue = false,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(editingValue);
   const [value, setValue] = useState(initialValue);
   const timeOutRef = useRef(null);
 
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
   const handleEditingComplete = () => {
     if (validate(value)) onEditingComplete(value);
-    else setValue(initialValue);
+    else {
+      setValue(initialValue);
+      onEditingComplete(initialValue);
+    }
   };
 
   const handleBlur = () => {
     if (value.length === 0) {
       setValue(initialValue);
-    } else {
-      handleEditingComplete();
     }
+    handleEditingComplete();
     setIsEditing(false);
   };
 
@@ -37,10 +36,6 @@ export const EditableField = ({
   const handleChange = (e) => {
     const newValue = e.target.value;
     setValue(newValue);
-    clearTimeout(timeOutRef.current);
-    timeOutRef.current = setTimeout(() => {
-      handleEditingComplete();
-    }, 500);
   };
 
   useEffect(() => {
