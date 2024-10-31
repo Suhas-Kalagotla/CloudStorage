@@ -64,7 +64,6 @@ const Home = ({ user }) => {
 
   const handleNameOfNewFolder = (newName) => {
     const uniqueName = generateUniqueFolderName(newName);
-    console.log(uniqueName);
     createFolderApi(uniqueName);
   };
 
@@ -98,7 +97,6 @@ const Home = ({ user }) => {
 
   const updateFolderName = (id, newName) => {
     const uniqueName = generateUniqueFolderName(newName, id);
-
     setFolders((prevFolders) =>
       prevFolders.map((folder) =>
         folder.id === id ? { ...folder, name: uniqueName } : folder,
@@ -142,13 +140,13 @@ const Home = ({ user }) => {
           <button onClick={handleCreateFolder}>create folder</button>
         </div>
         <div className="homeBody">
-          <div className="folderContainer" >
+          <div className="folderContainer">
             {folders.map(({ id, name }) => (
               <div
                 key={id}
                 className={`folder ${activeFolderId === id ? "active" : ""} `}
                 onClick={() => setActiveFolderId(id)}
-ref={folderContainerRef}
+                ref={folderContainerRef}
               >
                 <FolderIcon />
                 <EditableField

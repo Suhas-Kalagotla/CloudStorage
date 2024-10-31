@@ -39,13 +39,18 @@ export const EditableField = ({
   };
 
   useEffect(() => {
-    return () => clearTimeout(timeOutRef.current);
+    return () => {
+      if (timeOutRef.current) {
+        clearTimeout(timeOutRef.current);
+      }
+    };
   }, []);
 
   return (
     <div>
       {isEditing ? (
         <input
+          className="editable-input"
           type={type}
           value={value}
           onChange={(e) => handleChange(e)}
@@ -55,7 +60,15 @@ export const EditableField = ({
           style={{ width: `${value.length}ch` }}
         />
       ) : (
-        <span onDoubleClick={() => setIsEditing(true)}>{value}</span>
+        <span
+          onClick={(e) => e.stopPropagation()}
+          onDoubleClick={() => {
+            setIsEditing(true);
+          }}
+          className="editable-text"
+        >
+          {value}
+        </span>
       )}
     </div>
   );
