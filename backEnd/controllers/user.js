@@ -39,7 +39,6 @@ const createFolder = async (req, res) => {
     if (parentId === user.id) {
       const rootFolder = await getRootFolder();
       parentFolder = await getUniqueFolder(user.user_name, rootFolder.id);
-      console.log(parentFolder);
     } else {
       parentFolder = await getFolderById(parentId);
     }

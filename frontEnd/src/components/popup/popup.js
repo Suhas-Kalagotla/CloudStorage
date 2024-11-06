@@ -3,13 +3,15 @@ import "./popup.css";
 
 function PopUp({ message, onClose }) {
   const popupRef = useRef();
+
   useEffect(() => {
     function handleClickOutSide(event) {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
-        onClose();
+        onClose && onClose();
       }
     }
     document.addEventListener("mousedown", handleClickOutSide);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutSide);
     };
