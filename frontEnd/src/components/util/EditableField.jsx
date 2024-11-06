@@ -39,6 +39,10 @@ export const EditableField = ({
   };
 
   useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  useEffect(() => {
     return () => {
       if (timeOutRef.current) {
         clearTimeout(timeOutRef.current);
