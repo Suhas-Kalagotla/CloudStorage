@@ -18,6 +18,9 @@ const Home = ({ user }) => {
   const getFolders = async () => {
     try {
       const response = await axios.get(`${url}/user/getFolders`, {
+        params: {
+          folderId: "null",
+        },
         withCredentials: true,
       });
       if (response.status === 200) {
