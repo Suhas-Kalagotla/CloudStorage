@@ -12,9 +12,8 @@ const getFolders = async (req, res) => {
   try {
     const user = req.user;
     const { folderId } = req.query;
-
     let folder;
-    if (folderId === "null") {
+    if (!folderId || folderId === "null") {
       parentFolder = await getRootFolder();
       folder = await getUniqueFolder(user.user_name, parentFolder.id);
     } else {

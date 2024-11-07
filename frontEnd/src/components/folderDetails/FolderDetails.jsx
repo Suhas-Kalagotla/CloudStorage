@@ -3,9 +3,10 @@ import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
 import PopUp from "../popup/popup.js";
 import useFolders from "../../hooks/useFolders";
-import "./home.css";
+import { useParams } from "react-router-dom";
 
-const Home = ({ user }) => {
+const FolderDetails = ({ user }) => {
+  const { folderId } = useParams();
   const {
     folders,
     tempFolder,
@@ -38,7 +39,7 @@ const Home = ({ user }) => {
 
   useEffect(() => {
     if (animated) setAnimated(true);
-    fetchFolders();
+    fetchFolders(folderId);
   }, [animated]);
 
   const handleCreateFolder = () => {
@@ -103,4 +104,4 @@ const Home = ({ user }) => {
   );
 };
 
-export default Home;
+export default FolderDetails;

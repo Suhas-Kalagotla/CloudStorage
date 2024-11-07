@@ -10,6 +10,7 @@ import {
   Users,
   Landing,
   Folders,
+  FolderDetails,
 } from "./components";
 import { Loading } from "./components/util";
 import { ProtectedRoute } from "./components/util/ProtectedRoute";
@@ -79,6 +80,7 @@ function AppContent() {
         </Route>
         <Route path="/landing" element={<Landing />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/folders/:folderId" element={<FolderDetails />} />
         <Route
           path="/unauthorized"
           element={

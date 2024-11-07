@@ -11,9 +11,9 @@ const useFolders = (user) => {
   const [popupMessage, setPopupMessage] = useState(null);
   const [activeFolderId, setActiveFolderId] = useState(null);
 
-  const fetchFolders = async () => {
+  const fetchFolders = async (folderId = "null") => {
     try {
-      const folders = await getFolders();
+      const folders = await getFolders(folderId);
       setFolders(folders);
     } catch (err) {
       setPopupMessage("Failed to fetch folders");
@@ -28,6 +28,7 @@ const useFolders = (user) => {
       setTempFolder(null);
       fetchFolders();
     } catch (err) {
+      setTempFolder(null);
       setPopupMessage("Failed to create folder");
     }
   };

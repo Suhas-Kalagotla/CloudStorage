@@ -1,11 +1,11 @@
 import axios from "axios";
 import { url } from "../utils/url";
 
-export const getFolders = async () => {
+export const getFolders = async ( folderId) => {
   try {
     const response = await axios.get(`${url}/user/getFolders`, {
       params: {
-        folderId: "null",
+        folderId: folderId,
       },
       withCredentials: true,
     });
