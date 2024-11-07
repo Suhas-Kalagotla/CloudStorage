@@ -1,7 +1,7 @@
 import axios from "axios";
 import { url } from "../utils/url";
 
-export const getFolders = async ( folderId) => {
+export const getFolders = async (folderId) => {
   try {
     const response = await axios.get(`${url}/user/getFolders`, {
       params: {
@@ -16,11 +16,11 @@ export const getFolders = async ( folderId) => {
   }
 };
 
-export const createFolderApi = async (userId, newName) => {
+export const createFolderApi = async (parentId, newName) => {
   try {
     const response = await axios.post(
       `${url}/user/createFolder`,
-      { newName, parentId: userId },
+      { newName, parentId: parentId },
       {
         withCredentials: true,
       },

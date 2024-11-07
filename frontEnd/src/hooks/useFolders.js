@@ -11,7 +11,7 @@ const useFolders = (user) => {
   const [popupMessage, setPopupMessage] = useState(null);
   const [activeFolderId, setActiveFolderId] = useState(null);
 
-  const fetchFolders = async (folderId = "null") => {
+  const fetchFolders = async (folderId) => {
     try {
       const folders = await getFolders(folderId);
       setFolders(folders);
@@ -20,24 +20,24 @@ const useFolders = (user) => {
     }
   };
 
-  const createFolder = async (newName) => {
+  const createFolder = async (parentFolderId, newName) => {
     try {
       const uniqueName = generateUniqueFolderName(newName);
-      const response = await createFolderApi(user.id, uniqueName);
+      const response = await createFolderApi(parentFolderId, uniqueName);
       setActiveFolderId(response.folderId);
       setTempFolder(null);
-      fetchFolders();
+      fetchFolders(parentFolderId);
     } catch (err) {
       setTempFolder(null);
       setPopupMessage("Failed to create folder");
     }
   };
 
-  const updateFolderName = async (id, newName) => {
+  const updateFolderName = async (id, newName, folderId = "null") => {
     const uniqueName = generateUniqueFolderName(newName, id);
     try {
       await updateFolderNameApi(id, uniqueName);
-      fetchFolders();
+      fetchFolders(folderId);
     } catch (err) {
       setPopupMessage("Failed to update folder name");
     }

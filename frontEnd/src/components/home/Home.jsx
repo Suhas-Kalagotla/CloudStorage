@@ -38,7 +38,7 @@ const Home = ({ user }) => {
 
   useEffect(() => {
     if (animated) setAnimated(true);
-    fetchFolders();
+    fetchFolders(user?.id);
   }, [animated]);
 
   const handleCreateFolder = () => {
@@ -85,7 +85,9 @@ const Home = ({ user }) => {
                 <FolderIcon />
                 <EditableField
                   initialValue={tempFolder.name}
-                  onEditingComplete={(newName) => createFolder(newName)}
+                  onEditingComplete={(newName) =>
+                    createFolder(user?.id, newName)
+                  }
                   type={"text"}
                   validate={nameValidate}
                   isEditing={true}

@@ -80,7 +80,7 @@ function AppContent() {
         </Route>
         <Route path="/landing" element={<Landing />} />
         <Route path="/upload" element={<Upload />} />
-        <Route path="/folders/:folderId" element={<FolderDetails />} />
+        <Route path="/folders/:folderId" element={<FolderDetails user={user}/>} />
         <Route
           path="/unauthorized"
           element={

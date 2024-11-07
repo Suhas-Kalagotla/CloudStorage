@@ -40,7 +40,7 @@ const FolderDetails = ({ user }) => {
   useEffect(() => {
     if (animated) setAnimated(true);
     fetchFolders(folderId);
-  }, [animated]);
+  }, [animated, folderId]);
 
   const handleCreateFolder = () => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
@@ -74,7 +74,9 @@ const FolderDetails = ({ user }) => {
                 <FolderIcon folderId={id} />
                 <EditableField
                   initialValue={name}
-                  onEditingComplete={(newName) => updateFolderName(id, newName)}
+                  onEditingComplete={(newName) =>
+                    updateFolderName(id, newName, folderId)
+                  }
                   type={"text"}
                   validate={nameValidate}
                   idEditing={true}
@@ -86,7 +88,9 @@ const FolderDetails = ({ user }) => {
                 <FolderIcon />
                 <EditableField
                   initialValue={tempFolder.name}
-                  onEditingComplete={(newName) => createFolder(newName)}
+                  onEditingComplete={(newName) =>
+                    createFolder(user?.id, newName)
+                  }
                   type={"text"}
                   validate={nameValidate}
                   isEditing={true}
