@@ -4,6 +4,7 @@ import StorageBar from "../storageBar/StorageBar.jsx";
 import PopUp from "../popup/popup.js";
 import useFolders from "../../hooks/useFolders";
 import { useParams } from "react-router-dom";
+import FolderInfo from "../folderInfo/FolderInfo";
 
 const FolderDetails = ({ user }) => {
   const { folderId } = useParams();
@@ -98,7 +99,7 @@ const FolderDetails = ({ user }) => {
               </div>
             )}
           </div>
-          <div className="folderDataContainer"></div>
+          <div className="folderInfo"><FolderInfo/></div>
         </div>
       </div>
       {popupMessage !== null && (

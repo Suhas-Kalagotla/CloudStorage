@@ -1,6 +1,21 @@
 import axios from "axios";
 import { url } from "../utils/url";
 
+export const getFolderInfo = async (folderId) => {
+  try {
+    const response = await axios.get(`${url}/user/getFolderInfo`, {
+      params: {
+        folderId: folderId,
+      },
+      withCredentials: true,
+    });
+    return response.data.folder;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
 export const getFolders = async (folderId) => {
   try {
     const response = await axios.get(`${url}/user/getFolders`, {

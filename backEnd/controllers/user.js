@@ -30,6 +30,24 @@ const getFolders = async (req, res) => {
   }
 };
 
+const getFolderInfo = async (req, res) => {
+  try {
+    const { folderId } = req.query;
+    let folder = await getFolderById(folderId);
+
+    if (!folder) return res.status(409).json({ error: "No folder found" });
+
+    folder.type = "Folder";
+    delete folder.location;
+    delete folder.parent_folder_id;
+    delete folder.user_id;
+
+    res.status(200).json({ folder: folder });
+  } catch (err) {
+    res.status(500).json({ error: "Database Error " + err.message });
+  }
+};
+
 const createFolder = async (req, res) => {
   try {
     const user = req.user;
@@ -93,4 +111,4 @@ const updateFolderName = async (req, res) => {
   }
 };
 
-module.exports = { getFolders, createFolder, updateFolderName };
+module.exports = { getFolders, getFolderInfo, createFolder, updateFolderName };

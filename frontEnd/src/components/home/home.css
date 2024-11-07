@@ -22,7 +22,7 @@
   border-right: 2px solid black;
 }
 
-.folderDataContainer {
+.folderInfo {
   flex: 2;
   overflow-y: auto;
 }

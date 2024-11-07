@@ -4,6 +4,7 @@ import StorageBar from "../storageBar/StorageBar.jsx";
 import PopUp from "../popup/popup.js";
 import useFolders from "../../hooks/useFolders";
 import "./home.css";
+import FolderInfo from "../folderInfo/FolderInfo";
 
 const Home = ({ user }) => {
   const {
@@ -95,7 +96,11 @@ const Home = ({ user }) => {
               </div>
             )}
           </div>
-          <div className="folderDataContainer"></div>
+          <div className="folderInfo">
+    {activeFolderId && (
+    <FolderInfo folderId={activeFolderId}/>
+    )}
+    </div>
         </div>
       </div>
       {popupMessage !== null && (
