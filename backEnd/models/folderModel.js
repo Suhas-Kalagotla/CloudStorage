@@ -22,7 +22,7 @@ const getFolderById = (id) => {
 };
 
 const getFoldersByParentId = (id) => {
-  const query = `SELECT id,name,size FROM folder WHERE parent_folder_id=?`;
+  const query = `SELECT id,name,parent_folder_id,size FROM folder WHERE parent_folder_id=?`;
   return new Promise((resolve, reject) => {
     db.query(query, [id], (err, result) => {
       if (err) return reject(err);
