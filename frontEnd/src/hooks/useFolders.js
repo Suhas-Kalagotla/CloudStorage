@@ -33,11 +33,11 @@ const useFolders = (user) => {
     }
   };
 
-  const updateFolderName = async (id, newName, folderId = "null") => {
-    const uniqueName = generateUniqueFolderName(newName, id);
+  const updateFolderName = async (folderId, parent_folder_id, newName) => {
+    const uniqueName = generateUniqueFolderName(newName, folderId);
     try {
-      await updateFolderNameApi(id, uniqueName);
-      fetchFolders(folderId);
+      await updateFolderNameApi(folderId, uniqueName);
+      fetchFolders(parent_folder_id);
     } catch (err) {
       setPopupMessage("Failed to update folder name");
     }

@@ -11,7 +11,6 @@ const FolderInfo = ({ folderId }) => {
     try {
       const folder = await getFolderInfo(folderId);
       setFolder(folder);
-      console.log(folder);
     } catch (err) {
       setPopupMessage("Failed to get folder details");
     }

@@ -5,6 +5,7 @@ import PopUp from "../popup/popup.js";
 import useFolders from "../../hooks/useFolders";
 import "./home.css";
 import FolderInfo from "../folderInfo/FolderInfo";
+import { useParams } from "react-router-dom";
 
 const Home = ({ user }) => {
   const {
@@ -22,6 +23,7 @@ const Home = ({ user }) => {
 
   const folderContainerRef = useRef(null);
   const [animated, setAnimated] = useState(false);
+  const { folderId } = useParams();
 
   useEffect(() => {
     const handleClickOutSide = (event) => {
@@ -39,7 +41,7 @@ const Home = ({ user }) => {
 
   useEffect(() => {
     if (animated) setAnimated(true);
-    fetchFolders(user?.id);
+    fetchFolders(folderId || user?.id);
   }, [animated]);
 
   const handleCreateFolder = () => {
@@ -64,7 +66,7 @@ const Home = ({ user }) => {
         </div>
         <div className="homeBody">
           <div className="folderContainer">
-            {folders.map(({ id, name }) => (
+            {folders.map(({ id, name, parent_folder_id }) => (
               <div
                 key={id}
                 className={`folder ${activeFolderId === id ? "active" : ""} `}
@@ -74,7 +76,9 @@ const Home = ({ user }) => {
                 <FolderIcon folderId={id} />
                 <EditableField
                   initialValue={name}
-                  onEditingComplete={(newName) => updateFolderName(id, newName)}
+                  onEditingComplete={(newName) =>
+                    updateFolderName(id, parent_folder_id, newName)
+                  }
                   type={"text"}
                   validate={nameValidate}
                   idEditing={true}
@@ -87,7 +91,7 @@ const Home = ({ user }) => {
                 <EditableField
                   initialValue={tempFolder.name}
                   onEditingComplete={(newName) =>
-                    createFolder(user?.id, newName)
+                    createFolder(folderId ?? user?.id, newName)
                   }
                   type={"text"}
                   validate={nameValidate}
@@ -97,10 +101,8 @@ const Home = ({ user }) => {
             )}
           </div>
           <div className="folderInfo">
-    {activeFolderId && (
-    <FolderInfo folderId={activeFolderId}/>
-    )}
-    </div>
+            {activeFolderId && <FolderInfo folderId={activeFolderId} />}
+          </div>
         </div>
       </div>
       {popupMessage !== null && (
