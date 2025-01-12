@@ -20,20 +20,8 @@ app.use(
 );
 
 app.use("/auth", authenticationRoutes);
-app.use(
-  "/admin",
-  verifyToken,
-  authorizeRole(["admin"]),
-  verifyOwner,
-  adminRoutes,
-);
-app.use(
-  "/user",
-  verifyToken,
-  authorizeRole(["user", "admin"]),
-  verifyOwner,
-  userRoutes,
-);
+app.use("/admin", verifyToken, authorizeRole(["admin"]), adminRoutes);
+app.use("/user", verifyToken, authorizeRole(["user", "admin"]), userRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log("Server is running on port 3001");

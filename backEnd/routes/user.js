@@ -6,13 +6,14 @@ const {
   getFolderInfo,
   deleteFolder,
 } = require("../controllers/user.js");
+const verifyOwner = require("../middleware/verifyOwner.js");
 
 const router = express.Router();
 
-router.get("/getFolders", getFolders);
-router.get("/getFolderInfo", getFolderInfo);
+router.get("/getFolders",verifyOwner, getFolders);
+router.get("/getFolderInfo",verifyOwner, getFolderInfo);
 router.post("/createFolder", createFolder);
-router.patch("/updateName", updateFolderName);
-router.delete("/updateName", deleteFolder);
+router.patch("/updateName", verifyOwner,updateFolderName);
+router.delete("/updateName", verifyOwner,deleteFolder);
 
 module.exports = router;

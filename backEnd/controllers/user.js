@@ -6,22 +6,17 @@ const {
   getUniqueFolder,
   getRootFolder,
 } = require("../models/folderModel");
+
 const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
 
 const getFolders = async (req, res) => {
   try {
     const user = req.user;
-    const { folderId } = req.query;
-    let folder;
-    if (folderId === user.id) {
-      parentFolder = await getRootFolder();
-      folder = await getUniqueFolder(user.user_name, parentFolder.id);
-    } else {
-      folder = await getFolderById(folderId);
+    const folder = req.folder;
+
+    if (!folder) {
+      return res.status(409).json({ error: "No Folder found" });
     }
-
-    if (!folder) return res.status(409).json({ error: "No Folder found" });
-
     const allFolders = await getFoldersByParentId(folder.id);
 
     res.status(200).json({ folders: allFolders });
@@ -32,9 +27,7 @@ const getFolders = async (req, res) => {
 
 const getFolderInfo = async (req, res) => {
   try {
-    const { folderId } = req.query;
-    let folder = await getFolderById(folderId);
-
+    const folder = req.folder;
     if (!folder) return res.status(409).json({ error: "No folder found" });
 
     folder.type = "Folder";
@@ -86,8 +79,8 @@ const createFolder = async (req, res) => {
 
 const updateFolderName = async (req, res) => {
   try {
-    const { id, folderName } = req.body;
-    const folder = await getFolderById(id);
+    const { folderName } = req.body;
+    const folder = req.folder;
     if (!folder) {
       return res.status(409).json({ error: "Folder doesn't exists" });
     }
