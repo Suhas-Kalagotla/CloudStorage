@@ -70,7 +70,6 @@ const createUserFolder = async (req, res) => {
     let { id, user_name, size } = user;
 
     const root = await getRootFolder();
-
     const creatingFolder = await mkdirFolder(root.location, user_name);
     if (!size || size === 0) {
       size = 15;
@@ -100,4 +99,4 @@ const createUserFolder = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, updateUser, deleteUser ,createUserFolder};
+module.exports = { getUsers, updateUser, deleteUser, createUserFolder };

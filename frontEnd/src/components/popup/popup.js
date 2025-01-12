@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import "./popup.css";
 
-function PopUp({ message, onClose }) {
+const PopUp = ({ message, onClose }) => {
   const popupRef = useRef();
 
   useEffect(() => {
@@ -24,6 +24,6 @@ function PopUp({ message, onClose }) {
       </div>
     </div>
   );
-}
+};
 
 export default PopUp;

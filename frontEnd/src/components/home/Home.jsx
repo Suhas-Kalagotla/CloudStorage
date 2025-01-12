@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import axios from "axios";
 import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
 import PopUp from "../popup/popup.js";
@@ -6,6 +7,7 @@ import useFolders from "../../hooks/useFolders";
 import "./home.css";
 import FolderInfo from "../folderInfo/FolderInfo";
 import { useParams } from "react-router-dom";
+import { url } from "../../utils/url";
 
 const Home = ({ user }) => {
   const {
@@ -25,6 +27,9 @@ const Home = ({ user }) => {
   const [animated, setAnimated] = useState(false);
   const { folderId } = useParams();
 
+  const fileInputRef = useRef(null);
+  const [file, setFile] = useState(null);
+
   useEffect(() => {
     const handleClickOutSide = (event) => {
       if (
@@ -33,9 +38,9 @@ const Home = ({ user }) => {
       )
         setActiveFolderId(null);
     };
-    document.addEventListener("mousedown", handleClickOutSide);
+    document.addEventListener("dblclick", handleClickOutSide);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutSide);
+      document.removeEventListener("dblclick", handleClickOutSide);
     };
   }, [setActiveFolderId]);
 
@@ -46,6 +51,32 @@ const Home = ({ user }) => {
 
   const handleCreateFolder = () => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
+  };
+  const handleUpload = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileSelection = async (event) => {
+    const file = event.target.files[0];
+    setFile(file);
+    if (!file) {
+      setPopupMessage("No file selected");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const response = await axios.post(`${url}/user/fileUpload`, formData, {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        setPopupMessage("successfully uploaded");
+        fetchFolders(folderId || user?.id);
+      }
+    } catch (err) {
+      console.log(err);
+      setPopupMessage("An error occured during the upload");
+    }
   };
 
   const nameValidate = (value) => {
@@ -58,11 +89,19 @@ const Home = ({ user }) => {
       <div className="homeContainer">
         <div className="homeHead">
           <StorageBar
-            usedStorage={user?.used_storage}
-            totalStorage={user?.allocated_storage}
+            usedStorage={user.used_storage}
+            totalStorage={user.allocated_storage}
             animated={animated}
           />
           <button onClick={handleCreateFolder}>create folder</button>
+          <button onClick={handleUpload}>upload</button>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileSelection}
+          />
         </div>
         <div className="homeBody">
           <div className="folderContainer">
