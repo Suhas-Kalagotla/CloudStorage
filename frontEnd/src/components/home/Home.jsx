@@ -7,7 +7,7 @@ import useFolders from "../../hooks/useFolders";
 import "./home.css";
 import FolderInfo from "../folderInfo/FolderInfo";
 import { useParams } from "react-router-dom";
-import { url } from "../../utils/url";
+import fileUpload from "../../utils/fileUpload";
 
 const Home = ({ user }) => {
   const {
@@ -28,7 +28,6 @@ const Home = ({ user }) => {
   const { folderId } = useParams();
 
   const fileInputRef = useRef(null);
-  const [file, setFile] = useState(null);
 
   useEffect(() => {
     const handleClickOutSide = (event) => {
@@ -57,26 +56,12 @@ const Home = ({ user }) => {
   };
 
   const handleFileSelection = async (event) => {
-    const file = event.target.files[0];
-    setFile(file);
-    if (!file) {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) {
       setPopupMessage("No file selected");
       return;
     }
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const response = await axios.post(`${url}/user/fileUpload`, formData, {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        setPopupMessage("successfully uploaded");
-        fetchFolders(folderId || user?.id);
-      }
-    } catch (err) {
-      console.log(err);
-      setPopupMessage("An error occured during the upload");
-    }
+    await fileUpload(selectedFile, setPopupMessage, fetchFolders, folderId, user.id);
   };
 
   const nameValidate = (value) => {

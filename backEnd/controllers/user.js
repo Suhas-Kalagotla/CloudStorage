@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const {
   getFoldersByParentId,
   insertFolder,
@@ -6,6 +8,7 @@ const {
   getUniqueFolder,
   getRootFolder,
 } = require("../models/folderModel");
+const cryptoJS = require("crypto-js");
 
 const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
 
@@ -112,10 +115,58 @@ const deleteFolder = async (req, res) => {
   }
 };
 
+const uploadFile = async (req, res) => {
+  try {
+    const { fileName, folderId, chunk, isLastChunk } = req.fileData;
+    if (!fileName || !chunk || isLastChunk === undefined) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
+
+    const secretKey = "difficulttofindkey1290";
+
+    const bytes = cryptoJS.AES.decrypt(chunk, secretKey);
+    const decryptedChunk = Buffer.from(
+      cryptoJS.enc.Base64.stringify(bytes),
+      "base64",
+    );
+
+    const user = req.user;
+    let folder;
+    if (folderId === user.id) {
+      const parentFolder = await getRootFolder();
+      folder = await getUniqueFolder(user.user_name, parentFolder.id);
+    } else {
+      folder = await getFolderById(folderId);
+    }
+
+    if (folder.user_id !== user.id) {
+      return res.status(403).json({ error: "Forbidden to access" });
+    }
+
+    const uploadDir = folder.location;
+    const filePath = path.join(uploadDir, fileName);
+
+    fs.appendFileSync(filePath, decryptedChunk);
+
+    if (isLastChunk === "true") {
+      res.status(200).json({
+        message: "File uploaded and decrypted successfully",
+        filePath,
+      });
+    } else {
+      res.status(200).json({ message: "Chunk uploaded successfully" });
+    }
+  } catch (error) {
+    console.error("Error handling file upload:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getFolders,
   getFolderInfo,
   createFolder,
   deleteFolder,
   updateFolderName,
+  uploadFile,
 };
