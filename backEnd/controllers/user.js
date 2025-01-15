@@ -7,10 +7,13 @@ const {
   updateFolderNameDB,
   getUniqueFolder,
   getRootFolder,
+  updateFolderSize,
 } = require("../models/folderModel");
+const { updateUserSize } = require("../models/userModel.js");
 const cryptoJS = require("crypto-js");
 
 const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
+const { insertFile } = require("../models/fileModel.js");
 
 const getFolders = async (req, res) => {
   try {
@@ -82,7 +85,7 @@ const createFolder = async (req, res) => {
 
 const updateFolderName = async (req, res) => {
   try {
-    const { folderName } = req.body;
+    const { folderName } = req.query;
     const folder = req.folder;
     if (!folder) {
       return res.status(409).json({ error: "Folder doesn't exists" });
@@ -93,7 +96,7 @@ const updateFolderName = async (req, res) => {
     }
 
     const updateFolderMetaData = await updateFolderNameDB(
-      id,
+      folder.id,
       folderName,
       updateFolder,
     );
@@ -103,6 +106,7 @@ const updateFolderName = async (req, res) => {
     }
     res.status(200).json({ message: "Folder created successfully" });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Database Error " + err.message });
   }
 };
@@ -118,6 +122,7 @@ const deleteFolder = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const { fileName, folderId, chunk, isLastChunk } = req.fileData;
+    let { fileSize } = req.fileData;
     if (!fileName || !chunk || isLastChunk === undefined) {
       return res.status(400).json({ message: "Invalid request data" });
     }
@@ -148,10 +153,19 @@ const uploadFile = async (req, res) => {
 
     fs.appendFileSync(filePath, decryptedChunk);
 
+    fileSize = (fileSize / (1024 * 1024)).toFixed(2);
     if (isLastChunk === "true") {
-      res.status(200).json({
+      const result = await insertFile(fileName, filePath, fileSize, folder.id);
+      const folderSize = parseFloat(folder.size) + parseFloat(fileSize);
+      const userSize = parseFloat(user.used_storage) + parseFloat(fileSize);
+      const result2 = await updateFolderSize(folder.id, folderSize);
+      const result3 = await updateUserSize(user.id, userSize);
+      if (!result || result.affectedRows == 0) {
+        return res.status(409).json({ error: "file metadata not created" });
+      }
+      res.status(201).json({
         message: "File uploaded and decrypted successfully",
-        filePath,
+        userSize,
       });
     } else {
       res.status(200).json({ message: "Chunk uploaded successfully" });

@@ -9,7 +9,6 @@ const verifyOwner = async (req, res, next) => {
     const user = req.user;
     const { folderId } = req.query;
     let folder;
-
     if (folderId === user.id) {
       parentFolder = await getRootFolder();
       folder = await getUniqueFolder(user.user_name, parentFolder.id);

@@ -72,6 +72,15 @@ const updateUserAllocatedStorage = (id, size) => {
     });
   });
 };
+const updateUserSize = (id, size) => {
+  const query = `UPDATE users SET used_storage=? WHERE id=?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [size, id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
 
 module.exports = {
   insertUser,
@@ -81,4 +90,5 @@ module.exports = {
   updateUserRole,
   deleteUserById,
   updateUserAllocatedStorage,
+  updateUserSize,
 };

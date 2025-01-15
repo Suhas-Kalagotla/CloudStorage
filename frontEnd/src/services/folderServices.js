@@ -47,12 +47,15 @@ export const createFolderApi = async (parentId, newName) => {
   }
 };
 
-export const updateFolderNameApi = async (id, folderName) => {
+export const updateFolderNameApi = async (folderId, folderName) => {
   try {
     await axios.patch(
       `${url}/user/updateName`,
-      { id, folderName },
-      { withCredentials: true },
+      {},
+      {
+        params: { folderId, folderName },
+        withCredentials: true,
+      },
     );
   } catch (err) {
     console.log(err);

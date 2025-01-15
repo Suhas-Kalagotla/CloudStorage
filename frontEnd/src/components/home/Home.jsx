@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import axios from "axios";
 import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
 import PopUp from "../popup/popup.js";
@@ -25,6 +24,7 @@ const Home = ({ user }) => {
 
   const folderContainerRef = useRef(null);
   const [animated, setAnimated] = useState(false);
+  const [usedStorage, setStorage] = useState(user.used_storage);
   const { folderId } = useParams();
 
   const fileInputRef = useRef(null);
@@ -46,7 +46,8 @@ const Home = ({ user }) => {
   useEffect(() => {
     if (animated) setAnimated(true);
     fetchFolders(folderId || user?.id);
-  }, [animated]);
+    setActiveFolderId(null); 
+  }, [animated, folderId]);
 
   const handleCreateFolder = () => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
@@ -61,7 +62,16 @@ const Home = ({ user }) => {
       setPopupMessage("No file selected");
       return;
     }
-    await fileUpload(selectedFile, setPopupMessage, fetchFolders, folderId, user.id);
+    await fileUpload(
+      selectedFile,
+      setPopupMessage,
+      fetchFolders,
+      folderId,
+      user.id,
+      usedStorage,
+      user.allocated_storage,
+      setStorage,
+    );
   };
 
   const nameValidate = (value) => {
@@ -74,7 +84,7 @@ const Home = ({ user }) => {
       <div className="homeContainer">
         <div className="homeHead">
           <StorageBar
-            usedStorage={user.used_storage}
+            usedStorage={usedStorage}
             totalStorage={user.allocated_storage}
             animated={animated}
           />

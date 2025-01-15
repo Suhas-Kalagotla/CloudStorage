@@ -46,7 +46,7 @@ const Login = ({ onFormSwitch, onLogin }) => {
       onLogin(user);
       if (response.status === 500) {
         setErrors("Server Error");
-      } else if (user.role === "validate") {
+      } else if (user && user.role === "validate") {
         navigate("/landing");
       } else {
         navigate("/");
@@ -88,7 +88,7 @@ const Login = ({ onFormSwitch, onLogin }) => {
         {errors.length > 0 && (
           <div className="errorsContainer">
             {errors.map((error, index) => (
-              <p className="loginError">
+              <p key={index} className="loginError">
                 {index + 1}. {error}
               </p>
             ))}

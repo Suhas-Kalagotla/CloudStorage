@@ -10,7 +10,8 @@ const app = express();
 require("dotenv").config();
 
 app.use(cookieParser());
-
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(
   cors({
     origin: [process.env.FRONTEND_URL, process.env.URL],

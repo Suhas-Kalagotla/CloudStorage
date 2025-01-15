@@ -16,10 +16,10 @@ const {
 const router = express.Router();
 
 router.get("/getFolders", verifyOwner, getFolders);
-router.get("/getFolderInfo:folderId", verifyOwner, getFolderInfo);
+router.get("/getFolderInfo", verifyOwner, getFolderInfo);
 router.post("/createFolder", createFolder);
-router.post("/fileUpload",upload, uploadFile);
+router.post("/fileUpload", upload, uploadFile);
 router.patch("/updateName", verifyOwner, updateFolderName);
-router.delete("/updateName", verifyOwner, deleteFolder);
+router.delete("/deleteFolder", verifyOwner, deleteFolder);
 
 module.exports = router;

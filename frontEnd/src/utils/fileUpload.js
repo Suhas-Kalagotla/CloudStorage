@@ -8,6 +8,9 @@ const fileUpload = async (
   fetchFolders,
   folderId,
   userId,
+  usedStorage,
+  allocatedStorage,
+  setStorage,
 ) => {
   if (!file) {
     setPopupMessage("No file selected");
@@ -17,16 +20,20 @@ const fileUpload = async (
   const chunk_size = 64 * 1024;
   const reader = new FileReader();
   let offset = 0;
+  if (usedStorage + file.size / (1024 * 1024) > allocatedStorage) {
+    setPopupMessage("Storage limit reached contact admin");
+    return;
+  }
 
   const uploadChunk = async (encryptedChunk, isLastChunk) => {
     const formData = new FormData();
     formData.append("fileName", file.name);
     formData.append("folderId", folderId ?? userId);
     formData.append("chunk", encryptedChunk);
+    formData.append("fileSize", file.size);
     formData.append("isLastChunk", isLastChunk);
-
     try {
-      await axios.post(`${url}/user/fileUpload`, formData, {
+      const response = await axios.post(`${url}/user/fileUpload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -35,6 +42,7 @@ const fileUpload = async (
       if (isLastChunk) {
         setPopupMessage("Successfully uploaded");
         fetchFolders(folderId || userId);
+        setStorage(response.data.userSize);
       }
     } catch (err) {
       console.log(err);
