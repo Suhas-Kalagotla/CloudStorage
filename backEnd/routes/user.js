@@ -7,15 +7,17 @@ const {
   getFolderInfo,
   deleteFolder,
   uploadFile,
+  getFilesByFolderId,
 } = require("../controllers/user.js");
 const {
   verifyOwner,
-  verifyUploadOwner,
 } = require("../middleware/verifyOwner.js");
 
 const router = express.Router();
 
 router.get("/getFolders", verifyOwner, getFolders);
+router.get("/getFolderInfo", verifyOwner, getFolderInfo);
+router.get("/getAllFiles", verifyOwner, getFilesByFolderId);
 router.get("/getFolderInfo", verifyOwner, getFolderInfo);
 router.post("/createFolder", createFolder);
 router.post("/fileUpload", upload, uploadFile);

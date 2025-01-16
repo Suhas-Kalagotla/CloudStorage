@@ -13,7 +13,7 @@ const { updateUserSize } = require("../models/userModel.js");
 const cryptoJS = require("crypto-js");
 
 const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
-const { insertFile } = require("../models/fileModel.js");
+const { insertFile, getAllFiles } = require("../models/fileModel.js");
 
 const getFolders = async (req, res) => {
   try {
@@ -176,6 +176,19 @@ const uploadFile = async (req, res) => {
   }
 };
 
+const getFilesByFolderId = async (req, res) => {
+  try {
+    const folder = req.folder;
+    if (!folder) {
+      return res.status(409).json({ error: "No Folder found" });
+    }
+    const allFiles = await getAllFiles(folder.id);
+    res.status(200).json({ folders: allFiles });
+  } catch (err) {
+    res.status(500).json({ message: "Integernal server error" });
+  }
+};
+
 module.exports = {
   getFolders,
   getFolderInfo,
@@ -183,4 +196,5 @@ module.exports = {
   deleteFolder,
   updateFolderName,
   uploadFile,
+  getFilesByFolderId,
 };
