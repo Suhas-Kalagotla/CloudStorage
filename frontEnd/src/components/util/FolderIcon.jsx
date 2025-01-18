@@ -1,4 +1,5 @@
 import folderIcon from "../../assets/images/folder.png";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export const FolderIcon = ({ width = 48, height = 48, folderId = null }) => {

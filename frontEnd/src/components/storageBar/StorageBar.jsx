@@ -1,4 +1,5 @@
 import "./storageBar.css";
+import React from "react";
 import { useEffect, useState, useCallback } from "react";
 
 const StorageBar = ({ usedStorage, totalStorage, animated }) => {

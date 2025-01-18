@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import React from "react";
 import "./navigateButton.css";
 
 export const NavigateButton = ({ name, url, active = false }) => {

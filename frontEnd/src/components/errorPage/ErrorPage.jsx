@@ -1,4 +1,5 @@
 import "./errorPage.css";
+import React from "react";
 
 const ErrorPage = ({ statusCode, message }) => {
   return (

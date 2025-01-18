@@ -1,3 +1,5 @@
+
+import React from "react";
 const Storage = () => {
   return <div> this is storage page</div>;
 };
