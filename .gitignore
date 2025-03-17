@@ -1,1 +1,9 @@
-node_modules/
+#backend 
+backEnd/node_modules
+backEnd/.env
+backEnd/db.js
+
+
+#frontend
+frontEnd/node_modules
+frontEnd/.env
