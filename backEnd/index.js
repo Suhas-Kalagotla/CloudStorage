@@ -23,6 +23,10 @@ app.use("/auth", authenticationRoutes);
 app.use("/admin", verifyToken, authorizeRole(["admin"]), adminRoutes);
 app.use("/user", verifyToken, authorizeRole(["user", "admin"]), userRoutes);
 
+app.use("/api",()=> { 
+	console.log("working api"); 
+}); 
+
 app.listen(process.env.PORT, () => {
-  console.log("Server is running on port 3001");
+  console.log(`Server is running on port ${process.env.PORT}`);
 });

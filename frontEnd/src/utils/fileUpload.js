@@ -16,7 +16,7 @@ const fileUpload = async (
     setPopupMessage("No file selected");
     return;
   }
-  const secretKey = "difficulttofindkey1290";
+  const secretKey = "1ECCF50FDA384EB1EC77071AE4B4F3390951BFE3BC3E802C307AD51C45A45DDF";
   const chunk_size = 64 * 1024;
   const reader = new FileReader();
   let offset = 0;
