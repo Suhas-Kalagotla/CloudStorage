@@ -1,9 +1,8 @@
-#backend 
+#backEnd 
 backEnd/node_modules
 backEnd/.env
 backEnd/db.js
 
-
-#frontend
+#frontEnd
 frontEnd/node_modules
 frontEnd/.env
