@@ -42,7 +42,7 @@ const getFolderInfo = async (req, res) => {
     delete folder.parent_folder_id;
     delete folder.user_id;
 
-    res.status(200).json({ folder: folder });
+    return res.status(200).json({ folder: folder });
   } catch (err) {
     res.status(500).json({ error: "Database Error " + err.message });
   }

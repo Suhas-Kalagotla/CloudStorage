@@ -28,4 +28,4 @@ const verifyOwner = async (req, res, next) => {
   }
 };
 
-module.exports = verifyOwner;
+module.exports = { verifyOwner };
