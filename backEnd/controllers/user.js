@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const mime = require("mime-types");
 const {
   getFoldersByParentId,
   insertFolder,
@@ -127,7 +128,7 @@ const uploadFile = async (req, res) => {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
-    const secretKey = "difficulttofindkey1290";
+    const secretKey = process.env.SECRET_KEY;
 
     const bytes = cryptoJS.AES.decrypt(chunk, secretKey);
     const decryptedChunk = Buffer.from(
@@ -189,6 +190,47 @@ const getFilesByFolderId = async (req, res) => {
   }
 };
 
+const getFiles = async (req, res) => {
+  try {
+    folder = req.folder;
+    const files = await getAllFiles(folder.id);
+    if (!files || files.length === 0)
+      return res.status(400).json({ files: [] });
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Transfer-Encoding", "chunked");
+
+    const fileStreams = [];
+
+    for (const file of files) {
+      const filePath = file.location;
+      const fileSize = file.size;
+      const fileType = mime.lookup(filePath) || "application/octet-stream";
+
+      res.write(
+        JSON.stringify({
+          name: file.name,
+          size: fileSize,
+          type: fileType,
+        }) + "\n",
+      );
+
+      const readStream = fs.createReadStream(filePath, { encoding: "base64" });
+
+      for await (const chunk of readStream) {
+        res.write(chunk);
+      }
+
+      res.write("\n---END-FILE---\n");
+    }
+
+    res.end();
+  } catch (err) {
+    console.error("Error streaming files:", err);
+    res.status(500).json({ error: "Database Error " + err.message });
+  }
+};
+
 module.exports = {
   getFolders,
   getFolderInfo,
@@ -197,4 +239,5 @@ module.exports = {
   updateFolderName,
   uploadFile,
   getFilesByFolderId,
+  getFiles,
 };

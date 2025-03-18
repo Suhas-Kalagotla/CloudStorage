@@ -6,21 +6,17 @@ const insertFile = (name, location, size, folder_id) => {
   const id = uuidv4();
   return new Promise((resolve, reject) => {
     db.query(query, [id, name, location, size, folder_id], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
+      if (err) return reject(err);
       resolve({ result, id });
     });
   });
 };
 
 const getAllFiles = (folder_id) => {
-  const query = `SELECT name,size,created_at FROM FILES WHERE folder_id = ?`;
+  const query = `SELECT name,location,size,created_at FROM file WHERE folder_id = ?`;
   return new Promise((resolve, reject) => {
     db.query(query, [folder_id], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
+      if (err) return reject(err);
       resolve(result);
     });
   });

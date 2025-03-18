@@ -5,10 +5,9 @@ import {
   updateFolderNameApi,
 } from "../services/folderServices";
 
-const useFolders = (user) => {
+const useFolders = (user, setPopupMessage) => {
   const [folders, setFolders] = useState([]);
   const [tempFolder, setTempFolder] = useState(null);
-  const [popupMessage, setPopupMessage] = useState(null);
   const [activeFolderId, setActiveFolderId] = useState(null);
 
   const fetchFolders = async (folderId) => {
@@ -63,7 +62,6 @@ const useFolders = (user) => {
   return {
     folders,
     tempFolder,
-    popupMessage,
     setPopupMessage,
     activeFolderId,
     setTempFolder,

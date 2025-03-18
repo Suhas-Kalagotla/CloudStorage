@@ -8,10 +8,9 @@ const {
   deleteFolder,
   uploadFile,
   getFilesByFolderId,
+  getFiles,
 } = require("../controllers/user.js");
-const {
-  verifyOwner,
-} = require("../middleware/verifyOwner.js");
+const { verifyOwner } = require("../middleware/verifyOwner.js");
 
 const router = express.Router();
 
@@ -22,6 +21,7 @@ router.get("/getFolderInfo", verifyOwner, getFolderInfo);
 router.post("/createFolder", createFolder);
 router.post("/fileUpload", upload, uploadFile);
 router.patch("/updateName", verifyOwner, updateFolderName);
+router.get("/getFiles", verifyOwner, getFiles);
 router.delete("/deleteFolder", verifyOwner, deleteFolder);
 
 module.exports = router;
