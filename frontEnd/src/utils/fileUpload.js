@@ -16,7 +16,7 @@ const fileUpload = async (
     setPopupMessage("No file selected");
     return;
   }
-  const secretKey = "difficulttofindkey1290";
+  const secretKey = process.env.REACT_APP_SECRET_KEY;
   const chunk_size = 64 * 1024;
   const reader = new FileReader();
   let offset = 0;

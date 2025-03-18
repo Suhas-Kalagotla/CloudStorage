@@ -7,25 +7,27 @@ import "./home.css";
 import FolderInfo from "../folderInfo/FolderInfo";
 import { useParams } from "react-router-dom";
 import fileUpload from "../../utils/fileUpload";
+import useFiles from "../../hooks/useFiles";
 
 const Home = ({ user }) => {
-  const {
-    folders,
-    tempFolder,
-    popupMessage,
-    activeFolderId,
-    setTempFolder,
-    setActiveFolderId,
-    setPopupMessage,
-    createFolder,
-    updateFolderName,
-    fetchFolders,
-  } = useFolders(user);
-
   const folderContainerRef = useRef(null);
   const [animated, setAnimated] = useState(false);
   const [usedStorage, setStorage] = useState(user.used_storage);
+  const [popupMessage, setPopupMessage] = useState(null);
   const { folderId } = useParams();
+
+  const {
+    folders,
+    tempFolder,
+    activeFolderId,
+    setTempFolder,
+    setActiveFolderId,
+    createFolder,
+    updateFolderName,
+    fetchFolders,
+  } = useFolders(user, setPopupMessage);
+
+  const { files, fetchFiles } = useFiles(user, setPopupMessage);
 
   const fileInputRef = useRef(null);
 
@@ -46,7 +48,8 @@ const Home = ({ user }) => {
   useEffect(() => {
     if (animated) setAnimated(true);
     fetchFolders(folderId || user?.id);
-    setActiveFolderId(null); 
+    fetchFiles(folderId || user?.id);
+    setActiveFolderId(null);
   }, [animated, folderId]);
 
   const handleCreateFolder = () => {
@@ -99,6 +102,20 @@ const Home = ({ user }) => {
           />
         </div>
         <div className="homeBody">
+          <div className="fileContainer">
+            {files.map((file, index) => (
+              <div key={index}>
+                <img
+                  src={file.url}
+                  alt={file.name}
+                  style={{
+                    width: "300px",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            ))}
+          </div>
           <div className="folderContainer">
             {folders.map(({ id, name, parent_folder_id }) => (
               <div

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const mime = require("mime-types");
 const {
   getFoldersByParentId,
   insertFolder,
@@ -13,7 +14,7 @@ const { updateUserSize } = require("../models/userModel.js");
 const cryptoJS = require("crypto-js");
 
 const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
-const { insertFile } = require("../models/fileModel.js");
+const { insertFile, getAllFiles } = require("../models/fileModel.js");
 
 const getFolders = async (req, res) => {
   try {
@@ -41,7 +42,7 @@ const getFolderInfo = async (req, res) => {
     delete folder.parent_folder_id;
     delete folder.user_id;
 
-    res.status(200).json({ folder: folder });
+    return res.status(200).json({ folder: folder });
   } catch (err) {
     res.status(500).json({ error: "Database Error " + err.message });
   }
@@ -127,7 +128,7 @@ const uploadFile = async (req, res) => {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
-    const secretKey = "difficulttofindkey1290";
+    const secretKey = process.env.SECRET_KEY;
 
     const bytes = cryptoJS.AES.decrypt(chunk, secretKey);
     const decryptedChunk = Buffer.from(
@@ -176,6 +177,60 @@ const uploadFile = async (req, res) => {
   }
 };
 
+const getFilesByFolderId = async (req, res) => {
+  try {
+    const folder = req.folder;
+    if (!folder) {
+      return res.status(409).json({ error: "No Folder found" });
+    }
+    const allFiles = await getAllFiles(folder.id);
+    res.status(200).json({ folders: allFiles });
+  } catch (err) {
+    res.status(500).json({ message: "Integernal server error" });
+  }
+};
+
+const getFiles = async (req, res) => {
+  try {
+    folder = req.folder;
+    const files = await getAllFiles(folder.id);
+    if (!files || files.length === 0)
+      return res.status(400).json({ files: [] });
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Transfer-Encoding", "chunked");
+
+    const fileStreams = [];
+
+    for (const file of files) {
+      const filePath = file.location;
+      const fileSize = file.size;
+      const fileType = mime.lookup(filePath) || "application/octet-stream";
+
+      res.write(
+        JSON.stringify({
+          name: file.name,
+          size: fileSize,
+          type: fileType,
+        }) + "\n",
+      );
+
+      const readStream = fs.createReadStream(filePath, { encoding: "base64" });
+
+      for await (const chunk of readStream) {
+        res.write(chunk);
+      }
+
+      res.write("\n---END-FILE---\n");
+    }
+
+    res.end();
+  } catch (err) {
+    console.error("Error streaming files:", err);
+    res.status(500).json({ error: "Database Error " + err.message });
+  }
+};
+
 module.exports = {
   getFolders,
   getFolderInfo,
@@ -183,4 +238,6 @@ module.exports = {
   deleteFolder,
   updateFolderName,
   uploadFile,
+  getFilesByFolderId,
+  getFiles,
 };
