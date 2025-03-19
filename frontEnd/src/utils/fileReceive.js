@@ -1,42 +1,41 @@
-const fileReceive = async (files, setFiles, response) => {
+import cryptoJS from "crypto-js";
+
+const fileReceive = async (setFiles, response) => {
   try {
-    const reader = response.body.getReader();
-    let receivedBase64 = "";
-    let currentFileName = "";
-    let fileType = "image/png";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const textChunk = new TextDecoder().decode(value);
-      const lines = textChunk.split("\n");
-
-      for (const line of lines) {
-        if (line.startsWith("{")) {
-          const fileData = JSON.parse(line);
-          currentFileName = fileData.name;
-          fileType = fileData.type || "image/png";
-          receivedBase64 = "";
-        } else if (line === "---END-FILE---") {
-          const base64String = `data:${fileType};base64,${receivedBase64}`;
-          setFiles((prevFiles) => {
-            if (!prevFiles.some((file) => file.name === currentFileName)) {
-              return [
-                ...prevFiles,
-                { name: currentFileName, url: base64String },
-              ];
-            }
-            return prevFiles;
-          });
-        } else {
-          receivedBase64 += line;
+    const secretKey = process.env.REACT_APP_SECRET_KEY;
+    const data = await response.json();
+    const { files } = data;
+    const imageUrls = [];
+    for (let file of files) {
+      const { name, id, chunks } = file;
+      const decryptedChunks = [];
+      for (let { encryptedChunk } of chunks) {
+        const bytes = cryptoJS.AES.decrypt(encryptedChunk, secretKey);
+        const decryptedString = bytes.toString(cryptoJS.enc.Latin1);
+        const len = decryptedString.length;
+        let uint8Array = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          uint8Array[i] = decryptedString.charCodeAt(i);
         }
+        decryptedChunks.push(uint8Array);
       }
+      let totalLength = decryptedChunks.reduce(
+        (acc, cur) => acc + cur.length,
+        0,
+      );
+      let combinedArray = new Uint8Array(totalLength);
+      let offset = 0;
+      decryptedChunks.forEach((chunk) => {
+        combinedArray.set(chunk, offset);
+        offset += chunk.length;
+      });
+      const blob = new Blob([combinedArray]);
+      const imageUrl = URL.createObjectURL(blob);
+      imageUrls.push({ name,id, imageUrl });
     }
+    setFiles(imageUrls);
   } catch (err) {
-    console.log("error fetching files:", err);
+    console.log(err);
   }
 };
-
 export default fileReceive;

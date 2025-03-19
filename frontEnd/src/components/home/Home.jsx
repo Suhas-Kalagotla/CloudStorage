@@ -8,6 +8,7 @@ import FolderInfo from "../folderInfo/FolderInfo";
 import { useParams } from "react-router-dom";
 import fileUpload from "../../utils/fileUpload";
 import useFiles from "../../hooks/useFiles";
+import { ImageIcon } from "../util/ImageIcon";
 
 const Home = ({ user }) => {
   const folderContainerRef = useRef(null);
@@ -102,21 +103,19 @@ const Home = ({ user }) => {
           />
         </div>
         <div className="homeBody">
-          <div className="fileContainer">
-            {files.map((file, index) => (
-              <div key={index}>
-                <img
-                  src={file.url}
-                  alt={file.name}
-                  style={{
-                    width: "300px",
-                    objectFit: "cover",
-                  }}
+          <div className="folderContainer">
+            {files.map(({ name, id, imageUrl }) => (
+              <div className="files" key={id}>
+                <ImageIcon name={name} imageUrl={imageUrl} />
+                <EditableField
+                  initialValue={name}
+                  type={"text"}
+                  validate={nameValidate}
+                  idEditing={true}
                 />
               </div>
             ))}
-          </div>
-          <div className="folderContainer">
+
             {folders.map(({ id, name, parent_folder_id }) => (
               <div
                 key={id}

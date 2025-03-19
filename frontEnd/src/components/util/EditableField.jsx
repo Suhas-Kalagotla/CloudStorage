@@ -4,7 +4,7 @@ import React from "react";
 export const EditableField = ({
   initialValue,
   type,
-  onEditingComplete,
+  onEditingComplete = ()=> {},
   validate,
   isEditing: editingValue = false,
 }) => {

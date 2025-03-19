@@ -8,7 +8,7 @@ const useFiles = (user, setPopupMessage) => {
   const fetchFiles = async (folderId) => {
     try {
       const fileResponse = await getFiles(folderId);
-      await fileReceive(files, setFiles, fileResponse);
+      await fileReceive(setFiles, fileResponse);
     } catch (err) {
       setPopupMessage("Failed to fetch files");
     }

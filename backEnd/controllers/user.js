@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const mime = require("mime-types");
+const crypto = require("crypto");
+
 const {
   getFoldersByParentId,
   insertFolder,
@@ -15,6 +17,7 @@ const cryptoJS = require("crypto-js");
 
 const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
 const { insertFile, getAllFiles } = require("../models/fileModel.js");
+const cryptoJs = require("crypto-js");
 
 const getFolders = async (req, res) => {
   try {
@@ -192,42 +195,35 @@ const getFilesByFolderId = async (req, res) => {
 
 const getFiles = async (req, res) => {
   try {
-    folder = req.folder;
+    const chunkSize = 64 * 1024;
+    const secretKey = process.env.SECRET_KEY;
+    const folder = req.folder;
     const files = await getAllFiles(folder.id);
-    if (!files || files.length === 0)
-      return res.status(400).json({ files: [] });
-
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Transfer-Encoding", "chunked");
-
-    const fileStreams = [];
+    const result = [];
 
     for (const file of files) {
-      const filePath = file.location;
-      const fileSize = file.size;
-      const fileType = mime.lookup(filePath) || "application/octet-stream";
-
-      res.write(
-        JSON.stringify({
-          name: file.name,
-          size: fileSize,
-          type: fileType,
-        }) + "\n",
-      );
-
-      const readStream = fs.createReadStream(filePath, { encoding: "base64" });
-
-      for await (const chunk of readStream) {
-        res.write(chunk);
+      const fileBuffer = fs.readFileSync(file.location);
+      const name = file.name;
+      const id = file.id;
+      let chunks = [];
+      let offset = 0;
+      while (offset < fileBuffer.length) {
+        const chunk = fileBuffer.slice(offset, offset + chunkSize);
+        const encryptedChunk = cryptoJs.AES.encrypt(
+          cryptoJS.lib.WordArray.create(chunk),
+          secretKey,
+        ).toString();
+        offset += chunkSize;
+        const isLastChunk = offset >= fileBuffer.length;
+        chunks.push({ encryptedChunk, isLastChunk });
       }
-
-      res.write("\n---END-FILE---\n");
+      result.push({ name, id, chunks });
     }
 
-    res.end();
+    res.status(200).json({ files: result });
   } catch (err) {
-    console.error("Error streaming files:", err);
-    res.status(500).json({ error: "Database Error " + err.message });
+    console.error("Error:", err);
+    res.status(500).json({ error: "Server Error" });
   }
 };
 

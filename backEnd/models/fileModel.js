@@ -13,7 +13,7 @@ const insertFile = (name, location, size, folder_id) => {
 };
 
 const getAllFiles = (folder_id) => {
-  const query = `SELECT name,location,size,created_at FROM file WHERE folder_id = ?`;
+  const query = `SELECT id,name,location,size,created_at FROM file WHERE folder_id = ?`;
   return new Promise((resolve, reject) => {
     db.query(query, [folder_id], (err, result) => {
       if (err) return reject(err);
