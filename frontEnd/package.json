@@ -18,8 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "dev": "BROWSER=none nodemon index.js",
+    "start": "BROWSER=none react-scripts start",
+    "dev": "BROWSER=none nodemon src/index.js",
     "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

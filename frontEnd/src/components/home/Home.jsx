@@ -7,25 +7,28 @@ import "./home.css";
 import FolderInfo from "../folderInfo/FolderInfo";
 import { useParams } from "react-router-dom";
 import fileUpload from "../../utils/fileUpload";
+import useFiles from "../../hooks/useFiles";
+import { ImageIcon } from "../util/ImageIcon";
 
 const Home = ({ user }) => {
-  const {
-    folders,
-    tempFolder,
-    popupMessage,
-    activeFolderId,
-    setTempFolder,
-    setActiveFolderId,
-    setPopupMessage,
-    createFolder,
-    updateFolderName,
-    fetchFolders,
-  } = useFolders(user);
-
   const folderContainerRef = useRef(null);
   const [animated, setAnimated] = useState(false);
   const [usedStorage, setStorage] = useState(user.used_storage);
+  const [popupMessage, setPopupMessage] = useState(null);
   const { folderId } = useParams();
+
+  const {
+    folders,
+    tempFolder,
+    activeFolderId,
+    setTempFolder,
+    setActiveFolderId,
+    createFolder,
+    updateFolderName,
+    fetchFolders,
+  } = useFolders(user, setPopupMessage);
+
+  const { files, fetchFiles } = useFiles(user, setPopupMessage);
 
   const fileInputRef = useRef(null);
 
@@ -46,7 +49,8 @@ const Home = ({ user }) => {
   useEffect(() => {
     if (animated) setAnimated(true);
     fetchFolders(folderId || user?.id);
-    setActiveFolderId(null); 
+    fetchFiles(folderId || user?.id);
+    setActiveFolderId(null);
   }, [animated, folderId]);
 
   const handleCreateFolder = () => {
@@ -100,6 +104,18 @@ const Home = ({ user }) => {
         </div>
         <div className="homeBody">
           <div className="folderContainer">
+            {files.map(({ name, id, imageUrl }) => (
+              <div className="files" key={id}>
+                <ImageIcon name={name} imageUrl={imageUrl} />
+                <EditableField
+                  initialValue={name}
+                  type={"text"}
+                  validate={nameValidate}
+                  idEditing={true}
+                />
+              </div>
+            ))}
+
             {folders.map(({ id, name, parent_folder_id }) => (
               <div
                 key={id}

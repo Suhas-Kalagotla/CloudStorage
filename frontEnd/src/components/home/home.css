@@ -1,3 +1,7 @@
+* {
+  backdrop-filter: none !important;
+}
+
 .homeContainer {
   display: flex;
   flex-direction: column;
@@ -27,7 +31,16 @@
   overflow-y: auto;
 }
 
+.img {
+  width: 100%;
+  max-width: 100px;
+  height: auto;
+  object-fit: contain;
+  display: inline-block;
+}
+
 .folder,
+.files,
 .tempFolder {
   display: inline-flex;
   justify-content: center;
@@ -42,8 +55,8 @@
 }
 
 .folder.active {
-  background-color: #f0f0f0; /* Light gray */
-  border: 2px solid #007bff; /* Blue border */
+  background-color: #f0f0f0;
+  border: 2px solid #007bff;
 }
 
 .editable-text {
@@ -53,6 +66,10 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  text-align: center;
 }
 
 .editable-input {

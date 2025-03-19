@@ -1,5 +1,8 @@
 const fs = require("fs");
 const path = require("path");
+const mime = require("mime-types");
+const crypto = require("crypto");
+
 const {
   getFoldersByParentId,
   insertFolder,
@@ -13,7 +16,8 @@ const { updateUserSize } = require("../models/userModel.js");
 const cryptoJS = require("crypto-js");
 
 const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
-const { insertFile } = require("../models/fileModel.js");
+const { insertFile, getAllFiles } = require("../models/fileModel.js");
+const cryptoJs = require("crypto-js");
 
 const getFolders = async (req, res) => {
   try {
@@ -41,7 +45,7 @@ const getFolderInfo = async (req, res) => {
     delete folder.parent_folder_id;
     delete folder.user_id;
 
-    res.status(200).json({ folder: folder });
+    return res.status(200).json({ folder: folder });
   } catch (err) {
     res.status(500).json({ error: "Database Error " + err.message });
   }
@@ -127,7 +131,7 @@ const uploadFile = async (req, res) => {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
-    const secretKey = "difficulttofindkey1290";
+    const secretKey = process.env.SECRET_KEY;
 
     const bytes = cryptoJS.AES.decrypt(chunk, secretKey);
     const decryptedChunk = Buffer.from(
@@ -176,6 +180,53 @@ const uploadFile = async (req, res) => {
   }
 };
 
+const getFilesByFolderId = async (req, res) => {
+  try {
+    const folder = req.folder;
+    if (!folder) {
+      return res.status(409).json({ error: "No Folder found" });
+    }
+    const allFiles = await getAllFiles(folder.id);
+    res.status(200).json({ folders: allFiles });
+  } catch (err) {
+    res.status(500).json({ message: "Integernal server error" });
+  }
+};
+
+const getFiles = async (req, res) => {
+  try {
+    const chunkSize = 64 * 1024;
+    const secretKey = process.env.SECRET_KEY;
+    const folder = req.folder;
+    const files = await getAllFiles(folder.id);
+    const result = [];
+
+    for (const file of files) {
+      const fileBuffer = fs.readFileSync(file.location);
+      const name = file.name;
+      const id = file.id;
+      let chunks = [];
+      let offset = 0;
+      while (offset < fileBuffer.length) {
+        const chunk = fileBuffer.slice(offset, offset + chunkSize);
+        const encryptedChunk = cryptoJs.AES.encrypt(
+          cryptoJS.lib.WordArray.create(chunk),
+          secretKey,
+        ).toString();
+        offset += chunkSize;
+        const isLastChunk = offset >= fileBuffer.length;
+        chunks.push({ encryptedChunk, isLastChunk });
+      }
+      result.push({ name, id, chunks });
+    }
+
+    res.status(200).json({ files: result });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
 module.exports = {
   getFolders,
   getFolderInfo,
@@ -183,4 +234,6 @@ module.exports = {
   deleteFolder,
   updateFolderName,
   uploadFile,
+  getFilesByFolderId,
+  getFiles,
 };

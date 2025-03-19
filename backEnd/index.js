@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const authenticationRoutes = require("./routes/authenticationRoutes.js");
 const adminRoutes = require("./routes/admin.js");
 const userRoutes = require("./routes/user.js");
-const { verifyToken, authorizeRole, verifyOwner } = require("./middleware");
+const { verifyToken, authorizeRole } = require("./middleware");
 const app = express();
 require("dotenv").config();
 
@@ -19,9 +19,9 @@ app.use(
   }),
 );
 
-app.use("/auth", authenticationRoutes);
-app.use("/admin", verifyToken, authorizeRole(["admin"]), adminRoutes);
-app.use("/user", verifyToken, authorizeRole(["user", "admin"]), userRoutes);
+app.use("/api/auth", authenticationRoutes);
+app.use("/api/admin", verifyToken, authorizeRole(["admin"]), adminRoutes);
+app.use("/api/user", verifyToken, authorizeRole(["user", "admin"]), userRoutes);
 
 app.use("/api",()=> { 
 	console.log("working api"); 
