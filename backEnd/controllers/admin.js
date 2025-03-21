@@ -33,7 +33,7 @@ const updateUser = async (req, res) => {
     const user = await getUserById(id);
 
     const folderResponse = await updateFolderSize(
-      user.user_name,
+      user.id,
       allocatedStorage,
     );
 
