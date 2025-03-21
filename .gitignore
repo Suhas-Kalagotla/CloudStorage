@@ -6,3 +6,5 @@ backEnd/db.js
 #frontEnd
 frontEnd/node_modules
 frontEnd/.env
+frontEnd/.htaccess
+frontEnd/build
