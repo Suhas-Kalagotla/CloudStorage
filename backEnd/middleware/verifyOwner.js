@@ -7,7 +7,15 @@ const {
 const verifyOwner = async (req, res, next) => {
   try {
     const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const { folderId } = req.query;
+    if (!folderId) {
+      return res.status(400).json({ error: "folderId is required" });
+    }
+
     let folder;
     if (folderId === user.id) {
       parentFolder = await getRootFolder();
