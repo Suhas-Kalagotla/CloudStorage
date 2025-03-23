@@ -79,21 +79,38 @@ const Home = ({ user }) => {
   };
 
   const handleFileSelection = async (event) => {
-    const selectedFile = event.target.files[0];
-    if (!selectedFile) {
+    if (!event.target || !event.target.files) {
       setPopupMessage("No file selected");
       return;
     }
-    await fileUpload(
-      selectedFile,
-      setPopupMessage,
-      fetchFolders,
-      folderId,
-      user.id,
-      usedStorage,
-      user.allocated_storage,
-      setStorage,
-    );
+    const selectedFiles = event.target.files;
+
+    if (!selectedFiles || selectedFiles.length === 0) {
+      setPopupMessage("No file selected");
+      return;
+    }
+    const filesArray = Array.from(selectedFiles);
+
+    try {
+      await Promise.all(
+        filesArray.map((file) =>
+          fileUpload(
+            file,
+            setPopupMessage,
+            fetchFolders,
+            folderId,
+            user.id,
+            usedStorage,
+            user.allocated_storage,
+            setStorage,
+          ),
+        ),
+      );
+      setPopupMessage("Successfully uploaded");
+    fetchFiles(folderId || user?.id);
+    } catch (err) {
+      setPopupMessage("Failed to upload one or more files");
+    }
   };
 
   const nameValidate = (value) => {
@@ -101,7 +118,7 @@ const Home = ({ user }) => {
     return true;
   };
 
-  if (filesLoading | foldersLoading) {
+  if (filesLoading || foldersLoading) {
     return <Loading />;
   }
 
@@ -120,6 +137,7 @@ const Home = ({ user }) => {
             type="file"
             ref={fileInputRef}
             style={{ display: "none" }}
+            multiple
             onChange={handleFileSelection}
           />
         </div>

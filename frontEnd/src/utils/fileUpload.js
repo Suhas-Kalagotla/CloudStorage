@@ -40,7 +40,6 @@ const fileUpload = async (
         withCredentials: true,
       });
       if (isLastChunk) {
-        setPopupMessage("Successfully uploaded");
         fetchFolders(folderId || userId);
         setStorage(response.data.userSize);
       }

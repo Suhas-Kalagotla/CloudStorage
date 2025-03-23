@@ -24,19 +24,16 @@ import { useState, useEffect } from "react";
 function AppContent() {
   const location = useLocation();
   const [currentForm, setCurrentForm] = useState("login");
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
   const hideNavbarPaths = ["/login"];
 
   const toggleForm = (formName) => {
     setCurrentForm(formName);
   };
-
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setUser(JSON.parse(user));
-    }
-  }, []);
 
   const handleLogin = (user) => {
     setUser(user);
