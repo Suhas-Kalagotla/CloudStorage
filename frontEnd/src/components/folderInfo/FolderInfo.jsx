@@ -3,11 +3,12 @@ import { getFolderInfo } from "../../services/folderServices";
 import PopUp from "../popup/popup.js";
 import "./folderInfo.css";
 
-const FolderInfo = ({ folderId }) => {
+const FolderInfo = ({ folderId, handleDelete }) => {
   const [folder, setFolder] = useState();
   const [popupMessage, setPopupMessage] = useState(null);
+  const [toDelete, setDelete] = useState(false);
 
-  const getFolder = async (folderId) => {
+  const getFolder = async () => {
     try {
       const folder = await getFolderInfo(folderId);
       setFolder(folder);
@@ -16,13 +17,9 @@ const FolderInfo = ({ folderId }) => {
     }
   };
 
-  const handleDelete = () => {
-    setPopupMessage("confirm to delete");
-  };
-
   useEffect(() => {
-    getFolder(folderId);
-  }, [folderId]);
+    getFolder();
+  }, []);
 
   return (
     <>
@@ -39,7 +36,22 @@ const FolderInfo = ({ folderId }) => {
             })
             .replace(/\//g, "-")}
         </p>
-        <button onClick={() => handleDelete()}>Delete</button>
+        <button onClick={() => setDelete(true)}>Delete</button>
+        {toDelete && (
+          <div className="deleteContainer">
+            <p> Confirm to delete this folder </p>
+            <button
+              onClick={() => {
+                handleDelete(folderId);
+                setDelete(false);
+              }}
+            >
+              {" "}
+              Yes
+            </button>
+            <button onClick={() => setDelete(false)}> No </button>
+          </div>
+        )}
       </div>
       {popupMessage !== null && (
         <PopUp message={popupMessage} onClose={() => setPopupMessage(null)} />

@@ -1,3 +1,9 @@
-.folderInfoContainer{ 
-  margin:1rem;
+.folderInfoContainer {
+  margin: 1rem;
+}
+
+.deleteContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }

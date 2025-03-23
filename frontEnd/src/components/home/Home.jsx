@@ -7,6 +7,7 @@ import { PopUp, FolderInfo, Loading } from "../";
 import fileUpload from "../../utils/fileUpload";
 import useFolders from "../../hooks/useFolders";
 import useFiles from "../../hooks/useFiles";
+import { deleteFolderApi } from "../../services/folderServices";
 
 const Home = ({ user }) => {
   const folderContainerRef = useRef(null);
@@ -24,12 +25,13 @@ const Home = ({ user }) => {
     updateFolderName,
     fetchFolders,
     isLoading: foldersLoading,
-  } = useFolders(user, setPopupMessage);
+  } = useFolders(setPopupMessage);
 
-  const { files, fetchFiles, isLoading: filesLoading } = useFiles(
-    user,
-    setPopupMessage,
-  );
+  const {
+    files,
+    fetchFiles,
+    isLoading: filesLoading,
+  } = useFiles(user, setPopupMessage);
 
   const fileInputRef = useRef(null);
 
@@ -56,6 +58,22 @@ const Home = ({ user }) => {
   const handleCreateFolder = () => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
   };
+
+  const handleDelete = async (deleteFolderId) => {
+    try {
+      const response = await deleteFolderApi(deleteFolderId);
+      setPopupMessage(response.data.message);
+      setActiveFolderId(null);
+      fetchFolders(folderId || user?.id);
+    } catch (err) {
+      if (err.response) {
+        setPopupMessage(err.response.data.error);
+      } else {
+        setPopupMessage(err.message);
+      }
+    }
+  };
+
   const handleUpload = () => {
     fileInputRef.current.click();
   };
@@ -154,12 +172,22 @@ const Home = ({ user }) => {
             )}
           </div>
           <div className="folderInfo">
-            {activeFolderId && <FolderInfo folderId={activeFolderId} />}
+            {activeFolderId && (
+              <FolderInfo
+                folderId={activeFolderId}
+                handleDelete={handleDelete}
+              />
+            )}
           </div>
         </div>
       </div>
       {popupMessage !== null && (
-        <PopUp message={popupMessage} onClose={() => setPopupMessage(null)} />
+        <PopUp
+          message={popupMessage}
+          onClose={() => {
+            setPopupMessage(null);
+          }}
+        />
       )}
     </>
   );

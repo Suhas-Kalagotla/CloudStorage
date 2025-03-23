@@ -3,6 +3,7 @@ import {
   getFolders,
   createFolderApi,
   updateFolderNameApi,
+  deleteFolderApi,
 } from "../services/folderServices";
 
 const useFolders = (setPopupMessage) => {
@@ -63,6 +64,15 @@ const useFolders = (setPopupMessage) => {
     return name;
   };
 
+  const deleteFolder = async (folderId) => {
+    try {
+      await deleteFolderApi(folderId);
+      setActiveFolderId(null);
+    } catch (err) {
+      setPopupMessage("Failed to delete folder");
+    }
+  };
+
   return {
     folders,
     tempFolder,
@@ -73,7 +83,8 @@ const useFolders = (setPopupMessage) => {
     createFolder,
     updateFolderName,
     fetchFolders,
-    isLoading
+    isLoading,
+    deleteFolder
   };
 };
 

@@ -4,9 +4,7 @@ import { url } from "../utils/url";
 export const getFolderInfo = async (folderId) => {
   try {
     const response = await axios.get(`${url}/user/getFolderInfo`, {
-      params: {
-        folderId: folderId,
-      },
+      params: { folderId: folderId },
       withCredentials: true,
     });
     return response.data.folder;
@@ -54,6 +52,18 @@ export const updateFolderNameApi = async (folderId, folderName) => {
         withCredentials: true,
       },
     );
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const deleteFolderApi = async (folderId) => {
+  try {
+    const response = await axios.delete(`${url}/user/deleteFolder`, {
+      params: { folderId: folderId },
+      withCredentials: true,
+    });
+    return response;
   } catch (err) {
     throw err;
   }

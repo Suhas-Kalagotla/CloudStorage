@@ -64,14 +64,14 @@ function AppContent() {
             )
           }
         />
-         <Route
-           path="/admin"
+        <Route
+          path="/admin"
           element={<ProtectedRoute allowedRoles={["admin"]} user={user} />}
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="folders" element={<Folders />} />
-       </Route>
+        </Route>
         <Route path="/landing" element={<Landing />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/folders/:folderId" element={<Home user={user} />} />

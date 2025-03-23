@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const {
   getFoldersByParentId,
   insertFolder,
+  deleteFolderDB,
   getFolderById,
   updateFolderNameDB,
   getUniqueFolder,
@@ -13,15 +14,20 @@ const {
   updateFolderSize,
 } = require("../models/folderModel");
 const { updateUserSize } = require("../models/userModel.js");
-const cryptoJS = require("crypto-js");
-
-const { mkdirFolder, renameFolder } = require("../utils/folderUtils.js");
-const { insertFile, getAllFiles } = require("../models/fileModel.js");
+const {
+  insertFile,
+  getAllFiles,
+  countFiles,
+} = require("../models/fileModel.js");
+const {
+  mkdirFolder,
+  renameFolder,
+  rmFolder,
+} = require("../utils/folderUtils.js");
 const cryptoJs = require("crypto-js");
 
 const getFolders = async (req, res) => {
   try {
-    const user = req.user;
     const folder = req.folder;
 
     if (!folder) {
@@ -31,7 +37,8 @@ const getFolders = async (req, res) => {
 
     res.status(200).json({ folders: allFolders });
   } catch (err) {
-    res.status(500).json({ error: "Database Error " + err.message });
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error" });
   }
 };
 
@@ -47,7 +54,8 @@ const getFolderInfo = async (req, res) => {
 
     return res.status(200).json({ folder: folder });
   } catch (err) {
-    res.status(500).json({ error: "Database Error " + err.message });
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error" });
   }
 };
 
@@ -83,7 +91,8 @@ const createFolder = async (req, res) => {
       .status(201)
       .json({ message: "Folder created successfully", folderId: result.id });
   } catch (err) {
-    res.status(500).json({ error: "Database Error " + err.message });
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error" });
   }
 };
 
@@ -96,7 +105,7 @@ const updateFolderName = async (req, res) => {
     }
     const updateFolder = await renameFolder(folder.location, folderName);
     if (!updateFolder) {
-      res.status(409).json({ error: "Failed to rename folder" });
+      return res.status(409).json({ error: "Failed to rename folder" });
     }
 
     const updateFolderMetaData = await updateFolderNameDB(
@@ -106,20 +115,29 @@ const updateFolderName = async (req, res) => {
     );
 
     if (!updateFolderMetaData) {
-      res.status(409).json({ error: "Failed to rename folder" });
+      return res.status(409).json({ error: "Failed to rename folder" });
     }
     res.status(200).json({ message: "Folder created successfully" });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Database Error " + err.message });
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error " });
   }
 };
 
 const deleteFolder = async (req, res) => {
   try {
-    res.status(404).json({ error: "feature is pending cannot delete folder" });
+    const folder = req.folder;
+    const count = await countFiles(folder.id);
+    if (count.file_count > 0) {
+      return res.status(400).json({ error: "Folder is not empty" });
+    }
+    await deleteFolderDB(folder.id);
+    await rmFolder(folder.location);
+
+    res.status(200).json({ message: `${folder.name} deleted successfully` });
   } catch (err) {
-    res.status(500).json({ error: "Database Error " + err.message });
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error" });
   }
 };
 
@@ -133,9 +151,9 @@ const uploadFile = async (req, res) => {
 
     const secretKey = process.env.SECRET_KEY;
 
-    const bytes = cryptoJS.AES.decrypt(chunk, secretKey);
+    const bytes = cryptoJs.AES.decrypt(chunk, secretKey);
     const decryptedChunk = Buffer.from(
-      cryptoJS.enc.Base64.stringify(bytes),
+      cryptoJs.enc.Base64.stringify(bytes),
       "base64",
     );
 
@@ -174,8 +192,8 @@ const uploadFile = async (req, res) => {
     } else {
       res.status(200).json({ message: "Chunk uploaded successfully" });
     }
-  } catch (error) {
-    console.error("Error handling file upload:", error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -189,7 +207,8 @@ const getFilesByFolderId = async (req, res) => {
     const allFiles = await getAllFiles(folder.id);
     res.status(200).json({ folders: allFiles });
   } catch (err) {
-    res.status(500).json({ message: "Integernal server error" });
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -210,7 +229,7 @@ const getFiles = async (req, res) => {
       while (offset < fileBuffer.length) {
         const chunk = fileBuffer.slice(offset, offset + chunkSize);
         const encryptedChunk = cryptoJs.AES.encrypt(
-          cryptoJS.lib.WordArray.create(chunk),
+          cryptoJs.lib.WordArray.create(chunk),
           secretKey,
         ).toString();
         offset += chunkSize;
@@ -222,8 +241,8 @@ const getFiles = async (req, res) => {
 
     res.status(200).json({ files: result });
   } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ error: "Server Error" });
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error" });
   }
 };
 

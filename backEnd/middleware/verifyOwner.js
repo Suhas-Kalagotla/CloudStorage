@@ -12,8 +12,9 @@ const verifyOwner = async (req, res, next) => {
     }
 
     const { folderId } = req.query;
+
     if (!folderId) {
-      return res.status(400).json({ error: "folderId is required" });
+      return res.status(400).json({ error: "FolderId is required" });
     }
 
     let folder;
@@ -22,6 +23,9 @@ const verifyOwner = async (req, res, next) => {
       folder = await getUniqueFolder(user.user_name, parentFolder.id);
     } else {
       folder = await getFolderById(folderId);
+    }
+    if (!folder) {
+      return res.status(400).json({ error: "Folder does not exist" });
     }
 
     if (folder.user_id !== user.id) {

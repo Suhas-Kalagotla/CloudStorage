@@ -58,6 +58,18 @@ const insertFolder = (name, parentFolderId, location, size, userId) => {
   });
 };
 
+const deleteFolderDB = (folder_id) => {
+  const query = `DELETE FROM folder where id = ?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [folder_id], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve({ result });
+    });
+  });
+};
+
 const getRootFolder = () => {
   const query = `SELECT * FROM folder WHERE parent_folder_id IS NULL`;
   return new Promise((resolve, reject) => {
@@ -97,4 +109,5 @@ module.exports = {
   insertFolder,
   updateFolderSize,
   updateFolderNameDB,
+  deleteFolderDB,
 };
