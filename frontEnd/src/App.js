@@ -1,5 +1,5 @@
 import "./App.css";
-import React from "react"; 
+import React from "react";
 import {
   Home,
   Login,
@@ -12,43 +12,37 @@ import {
   Landing,
   Folders,
 } from "./components";
-import { Loading } from "./components/util";
 import { ProtectedRoute } from "./components/util/ProtectedRoute";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 function AppContent() {
-  const toggleForm = (formName) => {
-    setCurrentForm(formName);
-  };
-
   const location = useLocation();
   const [currentForm, setCurrentForm] = useState("login");
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
   const hideNavbarPaths = ["/login"];
-  const navigate = useNavigate();
+
+  const toggleForm = (formName) => {
+    setCurrentForm(formName);
+  };
 
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
       setUser(JSON.parse(user));
     }
-    setLoading(false);
-  }, [navigate]);
+  }, []);
 
   const handleLogin = (user) => {
     setUser(user);
     localStorage.setItem("user", JSON.stringify(user));
   };
-  if (loading) return <Loading />;
+
   return (
     <>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar user={user} />}
@@ -70,20 +64,17 @@ function AppContent() {
             )
           }
         />
-        <Route
-          path="/admin"
+         <Route
+           path="/admin"
           element={<ProtectedRoute allowedRoles={["admin"]} user={user} />}
         >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="folders" element={<Folders />} />
-        </Route>
+       </Route>
         <Route path="/landing" element={<Landing />} />
         <Route path="/upload" element={<Upload />} />
-        <Route
-          path="/folders/:folderId"
-          element={<Home user={user} />}
-        />
+        <Route path="/folders/:folderId" element={<Home user={user} />} />
         <Route
           path="/unauthorized"
           element={

@@ -5,10 +5,12 @@ import axios from "axios";
 import { url } from "../../utils/url";
 import { useNavigate } from "react-router-dom";
 import { EditableField } from "../util/EditableField";
+import { Loading } from "../../components";
 
 const Users = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [updateUsers, setUpdateUsers] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -24,9 +26,9 @@ const Users = () => {
         navigate("/unauthorized");
       } else if (status === 403) {
         navigate("/forbidden");
-      } else {
-        console.log(err);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,7 +49,6 @@ const Users = () => {
       }
     } catch (err) {
       if (err.status === 501) console.log(err.response.data.error);
-      console.log(err);
     }
   };
 

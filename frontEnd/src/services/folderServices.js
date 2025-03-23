@@ -11,7 +11,6 @@ export const getFolderInfo = async (folderId) => {
     });
     return response.data.folder;
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
@@ -26,7 +25,6 @@ export const getFolders = async (folderId) => {
     });
     return response.data.folders;
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
@@ -42,7 +40,6 @@ export const createFolderApi = async (parentId, newName) => {
     );
     return response.data;
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
@@ -58,7 +55,6 @@ export const updateFolderNameApi = async (folderId, folderName) => {
       },
     );
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
