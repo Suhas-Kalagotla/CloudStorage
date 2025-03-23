@@ -5,17 +5,21 @@ import {
   updateFolderNameApi,
 } from "../services/folderServices";
 
-const useFolders = (user, setPopupMessage) => {
+const useFolders = (setPopupMessage) => {
   const [folders, setFolders] = useState([]);
   const [tempFolder, setTempFolder] = useState(null);
   const [activeFolderId, setActiveFolderId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchFolders = async (folderId) => {
     try {
+      setIsLoading(true);
       const folders = await getFolders(folderId);
       setFolders(folders);
     } catch (err) {
       setPopupMessage("Failed to fetch folders");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,6 +73,7 @@ const useFolders = (user, setPopupMessage) => {
     createFolder,
     updateFolderName,
     fetchFolders,
+    isLoading
   };
 };
 

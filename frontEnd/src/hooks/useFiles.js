@@ -4,13 +4,17 @@ import fileReceive from "../utils/fileReceive";
 
 const useFiles = (user, setPopupMessage) => {
   const [files, setFiles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchFiles = async (folderId) => {
     try {
+      setIsLoading(true);
       const fileResponse = await getFiles(folderId);
       await fileReceive(setFiles, fileResponse);
     } catch (err) {
       setPopupMessage("Failed to fetch files");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -18,6 +22,7 @@ const useFiles = (user, setPopupMessage) => {
     fetchFiles,
     files,
     setPopupMessage,
+    isLoading,
   };
 };
 

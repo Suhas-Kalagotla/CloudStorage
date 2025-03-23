@@ -9,3 +9,6 @@ export { default as Users } from "./users/Users.jsx";
 export { default as Storage } from "./storage/Storage.jsx";
 export { default as Landing } from "./Landing.jsx";
 export { default as Folders } from "./folders/Folders.jsx";
+export { default as Loading } from "./loadingPage/LoadingPage.jsx";
+export { default as FolderInfo } from "./folderInfo/FolderInfo.jsx";
+export { default as PopUp } from "./popup/popup.js";

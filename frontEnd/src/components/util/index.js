@@ -3,4 +3,4 @@ export { PasswordField } from "./PasswordField";
 export { NavigateButton } from "./NavigateButton";
 export { EditableField } from "./EditableField";
 export { FolderIcon } from "./FolderIcon";
-export { Loading } from "./Loading"; 
+export { ImageIcon } from "./ImageIcon";

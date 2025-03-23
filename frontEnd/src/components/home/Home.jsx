@@ -1,18 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
-import { FolderIcon, EditableField } from "../util";
-import StorageBar from "../storageBar/StorageBar.jsx";
-import PopUp from "../popup/popup.js";
-import useFolders from "../../hooks/useFolders";
-import "./home.css";
-import FolderInfo from "../folderInfo/FolderInfo";
 import { useParams } from "react-router-dom";
+import "./home.css";
+import { FolderIcon, EditableField, ImageIcon } from "../util";
+import StorageBar from "../storageBar/StorageBar.jsx";
+import { PopUp, FolderInfo, Loading } from "../";
 import fileUpload from "../../utils/fileUpload";
+import useFolders from "../../hooks/useFolders";
 import useFiles from "../../hooks/useFiles";
-import { ImageIcon } from "../util/ImageIcon";
 
 const Home = ({ user }) => {
   const folderContainerRef = useRef(null);
-  const [animated, setAnimated] = useState(false);
   const [usedStorage, setStorage] = useState(user.used_storage);
   const [popupMessage, setPopupMessage] = useState(null);
   const { folderId } = useParams();
@@ -26,9 +23,13 @@ const Home = ({ user }) => {
     createFolder,
     updateFolderName,
     fetchFolders,
+    isLoading: foldersLoading,
   } = useFolders(user, setPopupMessage);
 
-  const { files, fetchFiles } = useFiles(user, setPopupMessage);
+  const { files, fetchFiles, isLoading: filesLoading } = useFiles(
+    user,
+    setPopupMessage,
+  );
 
   const fileInputRef = useRef(null);
 
@@ -47,11 +48,10 @@ const Home = ({ user }) => {
   }, [setActiveFolderId]);
 
   useEffect(() => {
-    if (animated) setAnimated(true);
     fetchFolders(folderId || user?.id);
     fetchFiles(folderId || user?.id);
     setActiveFolderId(null);
-  }, [animated, folderId]);
+  }, [folderId]);
 
   const handleCreateFolder = () => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
@@ -83,6 +83,10 @@ const Home = ({ user }) => {
     return true;
   };
 
+  if (filesLoading | foldersLoading) {
+    return <Loading />;
+  }
+
   return (
     <>
       <div className="homeContainer">
@@ -90,7 +94,6 @@ const Home = ({ user }) => {
           <StorageBar
             usedStorage={usedStorage}
             totalStorage={user.allocated_storage}
-            animated={animated}
           />
           <button onClick={handleCreateFolder}>create folder</button>
           <button onClick={handleUpload}>upload</button>
