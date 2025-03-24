@@ -1,34 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { getFolderInfo } from "../../services/folderServices";
+import { getFileInfo } from "../../services/fileServices";
 import PopUp from "../popup/popup.js";
-import "./folderInfo.css";
+import "./activeInfo.css";
 
-const FolderInfo = ({ folderId, handleDelete }) => {
-  const [folder, setFolder] = useState();
+const ActiveInfo = ({ activeId, activeType, handleDelete }) => {
+  const [data, setData] = useState();
   const [popupMessage, setPopupMessage] = useState(null);
   const [toDelete, setDelete] = useState(false);
 
-  const getFolder = async () => {
+  const getInfo = async () => {
     try {
-      const folder = await getFolderInfo(folderId);
-      setFolder(folder);
+      let folder, file;
+      if (activeType === "folder") {
+        folder = await getFolderInfo(activeId);
+        setData(folder);
+      } else if (activeType === "file") {
+        file = await getFileInfo(activeId);
+        setData(file);
+      }
     } catch (err) {
       setPopupMessage("Failed to get folder details");
     }
   };
 
   useEffect(() => {
-    getFolder();
-  }, []);
+    if (activeId) {
+      getInfo();
+      setDelete(false);
+    }
+  }, [activeId]);
 
   return (
     <>
       <div className="folderInfoContainer">
-        <p> Type : {folder?.type} </p>
-        <p> Size : {folder?.size} </p>
+        <p> Type : {data?.type} </p>
+        <p> Size : {data?.size} </p>
         <p>
           Create At :{" "}
-          {new Date(folder?.created_at)
+          {new Date(data?.created_at)
             .toLocaleString("en-GB", {
               day: "2-digit",
               month: "2-digit",
@@ -42,7 +52,7 @@ const FolderInfo = ({ folderId, handleDelete }) => {
             <p> Confirm to delete this folder </p>
             <button
               onClick={() => {
-                handleDelete(folderId);
+                handleDelete(activeId);
                 setDelete(false);
               }}
             >
@@ -60,4 +70,4 @@ const FolderInfo = ({ folderId, handleDelete }) => {
   );
 };
 
-export default FolderInfo;
+export default ActiveInfo;

@@ -6,10 +6,9 @@ import {
   deleteFolderApi,
 } from "../services/folderServices";
 
-const useFolders = (setPopupMessage) => {
+const useFolders = (setPopupMessage, setIsActive) => {
   const [folders, setFolders] = useState([]);
   const [tempFolder, setTempFolder] = useState(null);
-  const [activeFolderId, setActiveFolderId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchFolders = async (folderId) => {
@@ -28,7 +27,7 @@ const useFolders = (setPopupMessage) => {
     try {
       const uniqueName = generateUniqueFolderName(newName);
       const response = await createFolderApi(parentFolderId, uniqueName);
-      setActiveFolderId(response.folderId);
+      setIsActive({ id: response.folderId, type: "folder" });
       setTempFolder(null);
       fetchFolders(parentFolderId);
     } catch (err) {
@@ -67,7 +66,7 @@ const useFolders = (setPopupMessage) => {
   const deleteFolder = async (folderId) => {
     try {
       await deleteFolderApi(folderId);
-      setActiveFolderId(null);
+      setIsActive({ id: null, type: null });
     } catch (err) {
       setPopupMessage("Failed to delete folder");
     }
@@ -77,14 +76,12 @@ const useFolders = (setPopupMessage) => {
     folders,
     tempFolder,
     setPopupMessage,
-    activeFolderId,
     setTempFolder,
-    setActiveFolderId,
     createFolder,
     updateFolderName,
     fetchFolders,
     isLoading,
-    deleteFolder
+    deleteFolder,
   };
 };
 

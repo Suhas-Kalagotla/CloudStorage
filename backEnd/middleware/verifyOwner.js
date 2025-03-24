@@ -35,7 +35,7 @@ const verifyOwner = async (req, res, next) => {
     req.folder = folder;
     next();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

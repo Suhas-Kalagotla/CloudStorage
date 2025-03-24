@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import "./home.css";
 import { FolderIcon, EditableField, ImageIcon } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
-import { PopUp, FolderInfo, Loading } from "../";
+import { PopUp, ActiveInfo, Loading } from "../";
 import fileUpload from "../../utils/fileUpload";
 import useFolders from "../../hooks/useFolders";
 import useFiles from "../../hooks/useFiles";
@@ -13,19 +13,18 @@ const Home = ({ user }) => {
   const folderContainerRef = useRef(null);
   const [usedStorage, setStorage] = useState(user.used_storage);
   const [popupMessage, setPopupMessage] = useState(null);
+  const [isActive, setIsActive] = useState({ id: null, type: null });
   const { folderId } = useParams();
 
   const {
     folders,
     tempFolder,
-    activeFolderId,
     setTempFolder,
-    setActiveFolderId,
     createFolder,
     updateFolderName,
     fetchFolders,
     isLoading: foldersLoading,
-  } = useFolders(setPopupMessage);
+  } = useFolders(setPopupMessage, setIsActive);
 
   const {
     files,
@@ -41,18 +40,18 @@ const Home = ({ user }) => {
         folderContainerRef.current &&
         !folderContainerRef.current.contains(event.target)
       )
-        setActiveFolderId(null);
+        setIsActive({ id: null, type: null });
     };
     document.addEventListener("dblclick", handleClickOutSide);
     return () => {
       document.removeEventListener("dblclick", handleClickOutSide);
     };
-  }, [setActiveFolderId]);
+  }, [setIsActive]);
 
   useEffect(() => {
     fetchFolders(folderId || user?.id);
     fetchFiles(folderId || user?.id);
-    setActiveFolderId(null);
+    setIsActive({ id: null, type: null });
   }, [folderId]);
 
   const handleCreateFolder = () => {
@@ -63,7 +62,7 @@ const Home = ({ user }) => {
     try {
       const response = await deleteFolderApi(deleteFolderId);
       setPopupMessage(response.data.message);
-      setActiveFolderId(null);
+      setIsActive({ id: null, type: null });
       fetchFolders(folderId || user?.id);
     } catch (err) {
       if (err.response) {
@@ -143,7 +142,11 @@ const Home = ({ user }) => {
         <div className="homeBody">
           <div className="folderContainer">
             {files.map(({ name, id, imageUrl }) => (
-              <div className="files" key={id}>
+              <div
+                className={`files ${isActive.id === id ? "active" : ""}`}
+                key={id}
+                onClick={() => setIsActive({ id: id, type: "file" })}
+              >
                 <ImageIcon name={name} imageUrl={imageUrl} />
                 <EditableField
                   initialValue={name}
@@ -157,8 +160,8 @@ const Home = ({ user }) => {
             {folders.map(({ id, name, parent_folder_id }) => (
               <div
                 key={id}
-                className={`folder ${activeFolderId === id ? "active" : ""} `}
-                onClick={() => setActiveFolderId(id)}
+                className={`folder ${isActive.id === id ? "active" : ""} `}
+                onClick={() => setIsActive({ id: id, type: "folder" })}
                 ref={folderContainerRef}
               >
                 <FolderIcon folderId={id} />
@@ -189,9 +192,10 @@ const Home = ({ user }) => {
             )}
           </div>
           <div className="folderInfo">
-            {activeFolderId && (
-              <FolderInfo
-                folderId={activeFolderId}
+            {isActive.id && (
+              <ActiveInfo
+                activeId={isActive.id}
+                activeType={isActive.type}
                 handleDelete={handleDelete}
               />
             )}

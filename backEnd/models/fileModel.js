@@ -32,8 +32,19 @@ const countFiles = (folder_id) => {
   });
 };
 
+const getFileInfoDB = (file_id) => {
+  const query = `SELECT * FROM file WHERE id = ?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [file_id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result[0]);
+    });
+  });
+};
+
 module.exports = {
   insertFile,
   getAllFiles,
   countFiles,
+  getFileInfoDB,
 };

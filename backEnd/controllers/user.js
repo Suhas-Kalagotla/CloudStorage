@@ -18,6 +18,7 @@ const {
   insertFile,
   getAllFiles,
   countFiles,
+  getFileInfoDB,
 } = require("../models/fileModel.js");
 const {
   mkdirFolder,
@@ -246,6 +247,23 @@ const getFiles = async (req, res) => {
   }
 };
 
+const getFileInfo = async (req, res) => {
+  try {
+    const { fileId } = req.query;
+    const file = await getFileInfoDB(fileId);
+    if (!file) return res.status(409).json({ error: "No folder found" });
+
+    file.type = "File";
+    delete file.location;
+    delete file.folder_id;
+
+    return res.status(200).json({ file: file });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error" });
+  }
+};
+
 module.exports = {
   getFolders,
   getFolderInfo,
@@ -255,4 +273,5 @@ module.exports = {
   uploadFile,
   getFilesByFolderId,
   getFiles,
+  getFileInfo,
 };
