@@ -5,7 +5,7 @@ import { url } from "../utils/url";
 const fileUpload = async (
   file,
   setPopupMessage,
-  fetchFolders,
+  fetchFiles,
   folderId,
   userId,
   usedStorage,
@@ -40,7 +40,7 @@ const fileUpload = async (
         withCredentials: true,
       });
       if (isLastChunk) {
-        fetchFolders(folderId || userId);
+        fetchFiles(folderId || userId);
         setStorage(response.data.userSize);
       }
     } catch (err) {

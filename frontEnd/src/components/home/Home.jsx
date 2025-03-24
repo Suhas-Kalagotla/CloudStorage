@@ -97,7 +97,7 @@ const Home = ({ user }) => {
           fileUpload(
             file,
             setPopupMessage,
-            fetchFolders,
+            fetchFiles,
             folderId,
             user.id,
             usedStorage,
@@ -107,7 +107,6 @@ const Home = ({ user }) => {
         ),
       );
       setPopupMessage("Successfully uploaded");
-    fetchFiles(folderId || user?.id);
     } catch (err) {
       setPopupMessage("Failed to upload one or more files");
     }
