@@ -8,6 +8,7 @@ import fileUpload from "../../utils/fileUpload";
 import useFolders from "../../hooks/useFolders";
 import useFiles from "../../hooks/useFiles";
 import { deleteFolderApi } from "../../services/folderServices";
+import { deleteFileApi } from "../../services/fileServices";
 
 const Home = ({ user }) => {
   const folderContainerRef = useRef(null);
@@ -58,12 +59,18 @@ const Home = ({ user }) => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
   };
 
-  const handleDelete = async (deleteFolderId) => {
+  const handleDelete = async (id, type) => {
     try {
-      const response = await deleteFolderApi(deleteFolderId);
-      setPopupMessage(response.data.message);
+      let response;
+      if (type === "folder") {
+        response = await deleteFolderApi(id);
+        fetchFolders(folderId || user?.id);
+      } else if (type === "file") {
+        response = await deleteFileApi(id, folderId || user?.id);
+        fetchFiles(folderId || user?.id);
+      }
       setIsActive({ id: null, type: null });
-      fetchFolders(folderId || user?.id);
+      setPopupMessage(response.data.message);
     } catch (err) {
       if (err.response) {
         setPopupMessage(err.response.data.error);
@@ -74,6 +81,7 @@ const Home = ({ user }) => {
   };
 
   const handleUpload = () => {
+    setIsActive({ id: null, type: null });
     fileInputRef.current.click();
   };
 
@@ -196,6 +204,8 @@ const Home = ({ user }) => {
               <ActiveInfo
                 activeId={isActive.id}
                 activeType={isActive.type}
+                setIsActive={setIsActive}
+                currentFolderId={folderId || user?.id}
                 handleDelete={handleDelete}
               />
             )}

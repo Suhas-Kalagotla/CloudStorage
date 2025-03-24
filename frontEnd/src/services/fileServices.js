@@ -13,13 +13,25 @@ export const getFiles = async (folderId) => {
   }
 };
 
-export const getFileInfo = async (fileId) => {
+export const getFileInfo = async (fileId, currentFolderId) => {
   try {
     const response = await axios.get(`${url}/user/getFileInfo`, {
-      params: { fileId: fileId },
+      params: { fileId: fileId, folderId: currentFolderId },
       withCredentials: true,
     });
     return response.data.file;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const deleteFileApi = async (fileId, folderId) => {
+  try {
+    const response = await axios.delete(`${url}/user/deleteFile`, {
+      params: { fileId: fileId, folderId: folderId },
+      withCredentials: true,
+    });
+    return response;
   } catch (err) {
     throw err;
   }

@@ -4,7 +4,13 @@ import { getFileInfo } from "../../services/fileServices";
 import PopUp from "../popup/popup.js";
 import "./activeInfo.css";
 
-const ActiveInfo = ({ activeId, activeType, handleDelete }) => {
+const ActiveInfo = ({
+  activeId,
+  activeType,
+  setIsActive,
+  currentFolderId,
+  handleDelete,
+}) => {
   const [data, setData] = useState();
   const [popupMessage, setPopupMessage] = useState(null);
   const [toDelete, setDelete] = useState(false);
@@ -16,11 +22,11 @@ const ActiveInfo = ({ activeId, activeType, handleDelete }) => {
         folder = await getFolderInfo(activeId);
         setData(folder);
       } else if (activeType === "file") {
-        file = await getFileInfo(activeId);
+        file = await getFileInfo(activeId, currentFolderId);
         setData(file);
       }
     } catch (err) {
-      setPopupMessage("Failed to get folder details");
+      setPopupMessage(`Failed to get ${activeType} details`);
     }
   };
 
@@ -49,10 +55,10 @@ const ActiveInfo = ({ activeId, activeType, handleDelete }) => {
         <button onClick={() => setDelete(true)}>Delete</button>
         {toDelete && (
           <div className="deleteContainer">
-            <p> Confirm to delete this folder </p>
+            <p> Confirm to delete this {activeType}</p>
             <button
               onClick={() => {
-                handleDelete(activeId);
+                handleDelete(activeId, activeType);
                 setDelete(false);
               }}
             >
@@ -64,7 +70,13 @@ const ActiveInfo = ({ activeId, activeType, handleDelete }) => {
         )}
       </div>
       {popupMessage !== null && (
-        <PopUp message={popupMessage} onClose={() => setPopupMessage(null)} />
+        <PopUp
+          message={popupMessage}
+          onClose={() => {
+            setPopupMessage(null);
+            setIsActive({ id: null, type: null });
+          }}
+        />
       )}
     </>
   );
