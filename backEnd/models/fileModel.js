@@ -42,9 +42,20 @@ const getFileInfoDB = (file_id) => {
   });
 };
 
+const deleteFileDB = (file_id) => {
+  const query = `DELETE FROM file WHERE id = ?`;
+  return new Promise((resolve, reject) => {
+    db.query(query, [file_id], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
 module.exports = {
   insertFile,
   getAllFiles,
   countFiles,
   getFileInfoDB,
+  deleteFileDB,
 };

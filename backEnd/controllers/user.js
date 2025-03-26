@@ -19,12 +19,14 @@ const {
   getAllFiles,
   countFiles,
   getFileInfoDB,
+  deleteFileDB,
 } = require("../models/fileModel.js");
 const {
   mkdirFolder,
   renameFolder,
   rmFolder,
 } = require("../utils/folderUtils.js");
+const { rmFile } = require("../utils/fileUtils.js");
 const cryptoJs = require("crypto-js");
 
 const getFolders = async (req, res) => {
@@ -251,13 +253,29 @@ const getFileInfo = async (req, res) => {
   try {
     const { fileId } = req.query;
     const file = await getFileInfoDB(fileId);
-    if (!file) return res.status(409).json({ error: "No folder found" });
+    if (!file) return res.status(409).json({ error: "No file found" });
 
     file.type = "File";
     delete file.location;
     delete file.folder_id;
 
     return res.status(200).json({ file: file });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error" });
+  }
+};
+
+const deleteFile = async (req, res) => {
+  try {
+    const { fileId } = req.query;
+    const file = await getFileInfoDB(fileId);
+    if (!file) return res.status(409).json({ error: "No file found" });
+    await deleteFileDB(file.id);
+    await rmFile(file.location);
+
+
+    res.status(200).json({ message: `${file.name} deleted successfully` });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server Error" });
@@ -274,4 +292,5 @@ module.exports = {
   getFilesByFolderId,
   getFiles,
   getFileInfo,
+  deleteFile,
 };

@@ -15,6 +15,8 @@ const Home = ({ user }) => {
   const [usedStorage, setStorage] = useState(user.used_storage);
   const [popupMessage, setPopupMessage] = useState(null);
   const [isActive, setIsActive] = useState({ id: null, type: null });
+  const [fullScreenImage, setFullScreenImage] = useState(null);
+
   const { folderId } = useParams();
 
   const {
@@ -119,6 +121,10 @@ const Home = ({ user }) => {
     }
   };
 
+  //  const handleDoubleClick = (imageUrl) => {
+  //    setFullScreenImage(imageUrl);
+  //  };
+  //
   const nameValidate = (value) => {
     if (value.length === 0) return false;
     return true;
