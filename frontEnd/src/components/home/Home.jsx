@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import "./home.css";
 import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
-import { PopUp, ActiveInfo, Loading, ImageDisplay, } from "../";
+import { PopUp, ActiveInfo, Loading, ImageDisplay } from "../";
 import fileUpload from "../../utils/fileUpload";
 import useFolders from "../../hooks/useFolders";
 import useFiles from "../../hooks/useFiles";
@@ -15,6 +15,7 @@ const Home = ({ user }) => {
   const [usedStorage, setStorage] = useState(user.used_storage);
   const [popupMessage, setPopupMessage] = useState(null);
   const [isActive, setIsActive] = useState({ id: null, type: null });
+  const [index, setIndex] = useState(null);
 
   const { folderId } = useParams();
 
@@ -154,13 +155,19 @@ const Home = ({ user }) => {
         </div>
         <div className="homeBody">
           <div className="folderContainer">
-            {files.map(({ name, id, imageUrl }) => (
+            {files.map(({ name, id, imageUrl }, index) => (
               <div
                 className={`files ${isActive.id === id ? "active" : ""}`}
                 key={id}
                 onClick={() => setIsActive({ id: id, type: "file" })}
               >
-                <ImageDisplay name={name} imageUrl={imageUrl} />
+                <ImageDisplay
+                  name={name}
+                  imageUrl={imageUrl}
+                  files={files}
+                  setIndex={setIndex}
+                  index={index}
+                />
                 <EditableField
                   initialValue={name}
                   type={"text"}
