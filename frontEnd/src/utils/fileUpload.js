@@ -44,7 +44,6 @@ const fileUpload = async (
         setStorage(response.data.userSize);
       }
     } catch (err) {
-      console.log(err);
       setPopupMessage(err.message);
     }
   };

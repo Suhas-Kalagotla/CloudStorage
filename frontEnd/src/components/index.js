@@ -12,3 +12,4 @@ export { default as Folders } from "./folders/Folders.jsx";
 export { default as Loading } from "./loadingPage/LoadingPage.jsx";
 export { default as ActiveInfo } from "./activeInfo/ActiveInfo.jsx";
 export { default as PopUp } from "./popup/popup.js";
+export { default as ImageDisplay } from "./imageDisplay/ImageDisplay.jsx";

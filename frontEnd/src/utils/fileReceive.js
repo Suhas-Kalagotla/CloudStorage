@@ -35,7 +35,7 @@ const fileReceive = async (setFiles, response) => {
     }
     setFiles(imageUrls);
   } catch (err) {
-    console.log(err);
+    throw err; 
   }
 };
 export default fileReceive;

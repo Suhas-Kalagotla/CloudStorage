@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getFiles } from "../services/fileServices";
 import fileReceive from "../utils/fileReceive";
 
-const useFiles = (user, setPopupMessage) => {
+const useFiles = ( setPopupMessage) => {
   const [files, setFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 

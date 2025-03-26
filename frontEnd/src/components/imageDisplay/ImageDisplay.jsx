@@ -5,15 +5,24 @@ import closeIcon from "../../assets/images/close.svg";
 import downloadIcon from "../../assets/images/download.svg";
 import leftIcon from "../../assets/images/left.svg";
 import rightIcon from "../../assets/images/right.svg";
-import "./imageIcon.css";
+import "./imageDisplay.css";
 
-export const ImageIcon = ({ name, imageUrl }) => {
+const ImageDisplay = ({ name, imageUrl }) => {
   const [fullScreenImage, setFullScreenImage] = useState(null);
   const getFileExtension = (fileName) => {
     return fileName.split(".").pop().toLowerCase();
   };
   const handleDoubleClick = (imageUrl) => {
     setFullScreenImage(imageUrl);
+  };
+
+  const handleDownload = () => {
+    const a = document.createElement("a");
+    a.href = imageUrl;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const fileExtension = getFileExtension(name);
@@ -31,7 +40,7 @@ export const ImageIcon = ({ name, imageUrl }) => {
       {fullScreenImage && (
         <div className="imageOverlay">
           <div className="topIcons">
-            <div className="iconBox">
+            <div className="iconBox" onClick={handleDownload}>
               <img src={downloadIcon} alt="Download Button" className="icon" />
             </div>
             <div className="iconBox">
@@ -64,3 +73,4 @@ export const ImageIcon = ({ name, imageUrl }) => {
     </>
   );
 };
+export default ImageDisplay;

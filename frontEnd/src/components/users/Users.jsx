@@ -5,12 +5,14 @@ import axios from "axios";
 import { url } from "../../utils/url";
 import { useNavigate } from "react-router-dom";
 import { EditableField } from "../util/EditableField";
-import { Loading } from "../../components";
+import Loading from "../loadingPage/LoadingPage";
+import { PopUp } from "../";
 
 const Users = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [updateUsers, setUpdateUsers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [popupMessage, setPopupMessage] = useState(null);
 
   const navigate = useNavigate();
 
@@ -48,7 +50,8 @@ const Users = () => {
         fetchAllUsers();
       }
     } catch (err) {
-      if (err.status === 501) console.log(err.response.data.error);
+      if (err.status === 501) setPopupMessage(err.response.data.error);
+      else setPopupMessage(err);
     }
   };
 
@@ -59,9 +62,12 @@ const Users = () => {
         { user },
         { withCredentials: true },
       );
-      if (response.status === 201) fetchAllUsers();
+      if (response.status === 201) {
+        setPopupMessage(response.data.message);
+        fetchAllUsers();
+      }
     } catch (err) {
-      console.log(err);
+      setPopupMessage(err.response.data.error);
     }
   };
 
@@ -96,6 +102,9 @@ const Users = () => {
     }
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <div className="usersContainer">
       <table>
@@ -174,6 +183,15 @@ const Users = () => {
           ))}
         </tbody>
       </table>
+
+      {popupMessage !== null && (
+        <PopUp
+          message={popupMessage}
+          onClose={() => {
+            setPopupMessage(null);
+          }}
+        />
+      )}
     </div>
   );
 };
