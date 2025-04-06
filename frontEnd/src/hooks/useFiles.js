@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getFiles } from "../services/fileServices";
 import fileReceive from "../utils/fileReceive";
 
-const useFiles = ( setPopupMessage) => {
+const useFiles = (setPopupMessage) => {
   const [files, setFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,7 +21,6 @@ const useFiles = ( setPopupMessage) => {
   return {
     fetchFiles,
     files,
-    setPopupMessage,
     isLoading,
   };
 };

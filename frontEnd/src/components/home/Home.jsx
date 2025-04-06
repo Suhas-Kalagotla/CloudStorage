@@ -9,10 +9,11 @@ import useFolders from "../../hooks/useFolders";
 import useFiles from "../../hooks/useFiles";
 import { deleteFolderApi } from "../../services/folderServices";
 import { deleteFileApi } from "../../services/fileServices";
+import { useUser } from "../../context/UserContext.jsx";
 
-const Home = ({ user }) => {
+const Home = () => {
   const folderContainerRef = useRef(null);
-  const [usedStorage, setStorage] = useState(user.used_storage);
+  const { user, updateUsedStorage } = useUser();
   const [popupMessage, setPopupMessage] = useState(null);
   const [isActive, setIsActive] = useState({ id: null, type: null });
   const [index, setIndex] = useState(null);
@@ -33,7 +34,7 @@ const Home = ({ user }) => {
     files,
     fetchFiles,
     isLoading: filesLoading,
-  } = useFiles(user, setPopupMessage);
+  } = useFiles(setPopupMessage);
 
   const fileInputRef = useRef(null);
 
@@ -64,6 +65,7 @@ const Home = ({ user }) => {
   const handleDelete = async (id, type) => {
     try {
       let response;
+
       if (type === "folder") {
         response = await deleteFolderApi(id);
         fetchFolders(folderId || user?.id);
@@ -109,9 +111,9 @@ const Home = ({ user }) => {
             fetchFiles,
             folderId,
             user.id,
-            usedStorage,
+            user.used_storage,
             user.allocated_storage,
-            setStorage,
+            updateUsedStorage,
           ),
         ),
       );
@@ -139,7 +141,7 @@ const Home = ({ user }) => {
       <div className="homeContainer">
         <div className="homeHead">
           <StorageBar
-            usedStorage={usedStorage}
+            usedStorage={user.used_storage}
             totalStorage={user.allocated_storage}
           />
           <button onClick={handleCreateFolder}>create folder</button>

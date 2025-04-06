@@ -10,7 +10,7 @@ const fileUpload = async (
   userId,
   usedStorage,
   allocatedStorage,
-  setStorage,
+  updateUsedStorage,
 ) => {
   if (!file) {
     setPopupMessage("No file selected");
@@ -41,7 +41,7 @@ const fileUpload = async (
       });
       if (isLastChunk) {
         fetchFiles(folderId || userId);
-        setStorage(response.data.userSize);
+        updateUsedStorage(response.data.userSize);
       }
     } catch (err) {
       setPopupMessage(err.message);

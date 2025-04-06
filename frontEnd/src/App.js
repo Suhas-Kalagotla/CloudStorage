@@ -7,7 +7,6 @@ import {
   Dashboard,
   ErrorPage,
   Navbar,
-  Upload,
   Users,
   Landing,
   Folders,
@@ -20,6 +19,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useState } from "react";
+import { UserProvider } from "./context/UserContext";
 
 function AppContent() {
   const location = useLocation();
@@ -49,7 +49,7 @@ function AppContent() {
             <ProtectedRoute allowedRoles={["user", "admin"]} user={user} />
           }
         >
-          <Route path="/" element={<Home user={user} />} />
+          <Route path="/" element={<Home />} />
         </Route>
         <Route
           path="/login"
@@ -70,8 +70,7 @@ function AppContent() {
           <Route path="folders" element={<Folders />} />
         </Route>
         <Route path="/landing" element={<Landing />} />
-        <Route path="/upload" element={<Upload />} />
-        <Route path="/folders/:folderId" element={<Home user={user} />} />
+        <Route path="/folders/:folderId" element={<Home />} />
         <Route
           path="/unauthorized"
           element={
@@ -96,9 +95,11 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <div className="App">
-        <AppContent />
-      </div>
+      <UserProvider>
+        <div className="App">
+          <AppContent />
+        </div>
+      </UserProvider>
     </Router>
   );
 }

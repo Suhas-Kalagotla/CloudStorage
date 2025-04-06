@@ -1,103 +1,59 @@
 const db = require("../db");
 const { v4: uuidv4 } = require("uuid");
 
-const getUniqueFolder = (name, parentId) => {
+const getUniqueFolder = async (name, parentId) => {
   const query = `SELECT * FROM folder WHERE parent_folder_id=? AND name=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [parentId, name], (err, result) => {
-      if (err) return reject(err);
-      resolve(result.length === 1 ? result[0] : null);
-    });
-  });
+  const [result] = await db.promise().query(query, [parentId, name]);
+  return result.length === 1 ? result[0] : null;
 };
 
-const getFolderById = (id) => {
+const getFolderById = async (id) => {
   const query = `SELECT * FROM folder WHERE id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result.length === 1 ? result[0] : null);
-    });
-  });
+  const [result] = await db.promise().query(query, [id]);
+  return result.length === 1 ? result[0] : null;
 };
 
-const getFoldersByParentId = (id) => {
+const getFoldersByParentId = async (id) => {
   const query = `SELECT id,name,parent_folder_id,size FROM folder WHERE parent_folder_id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [id]);
+  return result;
 };
 
-const getAllFolders = () => {
+const getAllFolders = async () => {
   const query = `SELECT * FROM folder`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query);
+  return result;
 };
 
-const insertFolder = (name, parentFolderId, location, size, userId) => {
+const insertFolder = async (name, parentFolderId, location, size, userId) => {
   const query = `INSERT IGNORE INTO folder (id,name,parent_folder_id,location,size,user_id) VALUES (?,?,?,?,?,?)`;
   const id = uuidv4();
-  return new Promise((resolve, reject) => {
-    db.query(
-      query,
-      [id, name, parentFolderId, location, size, userId],
-      (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve({ result, id });
-      },
-    );
-  });
+  const [result] = await db.promise().query(query, [id, name, parentFolderId, location, size, userId]);
+  return { result, id };
 };
 
-const deleteFolderDB = (folder_id) => {
+const deleteFolderDB = async (folder_id) => {
   const query = `DELETE FROM folder where id = ?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [folder_id], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve({ result });
-    });
-  });
+  const [result] = await db.promise().query(query, [folder_id]);
+  return { result };
 };
 
-const getRootFolder = () => {
+const getRootFolder = async () => {
   const query = `SELECT * FROM folder WHERE parent_folder_id IS NULL`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [], (err, result) => {
-      if (err) return reject(err);
-      resolve(result[0]);
-    });
-  });
+  const [result] = await db.promise().query(query);
+  return result[0];
 };
 
-const updateFolderSize = (id, size) => {
+const updateFolderSize = async (id, size) => {
   const query = `UPDATE folder SET size=? WHERE user_id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [size, id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [size, id]);
+  return result;
 };
 
-const updateFolderNameDB = (id, name, location) => {
+const updateFolderNameDB = async (id, name, location) => {
   const query = `UPDATE folder SET name=?, location=?  WHERE id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [name, location, id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [name, location, id]);
+  return result;
 };
 
 module.exports = {
@@ -111,3 +67,4 @@ module.exports = {
   updateFolderNameDB,
   deleteFolderDB,
 };
+

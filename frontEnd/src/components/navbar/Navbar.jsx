@@ -42,11 +42,6 @@ const Navbar = ({ user }) => {
         {user && user.role !== "validate" && (
           <>
             <NavigateButton name="Home" url="/" active={isActive("/")} />
-            <NavigateButton
-              name="Upload"
-              url="/upload"
-              active={isActive("/upload")}
-            />
           </>
         )}
         {user && user.role === "admin" && (

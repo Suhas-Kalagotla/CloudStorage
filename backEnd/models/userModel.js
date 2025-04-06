@@ -1,85 +1,53 @@
 const db = require("../db.js");
 const { v4: uuidv4 } = require("uuid");
 
-const insertUser = (userName, email, password, role) => {
+const insertUser = async (userName, email, password, role) => {
   const query = `INSERT IGNORE INTO users (id,user_name, email , password,role) VALUES (?, ?, ?, ?, ?)`;
   const id = uuidv4();
-
-  return new Promise((resolve, reject) => {
-    db.query(query, [id, userName, email, password, role], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [id, userName, email, password, role]);
+  return result;
 };
 
-const getUserByEmail = (email) => {
+const getUserByEmail = async (email) => {
   const query = `SELECT * FROM users WHERE email = ? `;
-  return new Promise((resolve, reject) => {
-    db.query(query, [email], (err, result) => {
-      if (err) return reject(err);
-      resolve(result.length === 1 ? result[0] : null);
-    });
-  });
+  const [result] = await db.promise().query(query, [email]);
+  return result.length === 1 ? result[0] : null;
 };
 
-const getUserById = (id) => {
+const getUserById = async (id) => {
   const query = `SELECT id,user_name,email,role,used_storage,allocated_storage,created_at FROM users WHERE id= ? `;
-  return new Promise((resolve, reject) => {
-    db.query(query, [id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result.length === 1 ? result[0] : null);
-    });
-  });
+  const [result] = await db.promise().query(query, [id]);
+  return result.length === 1 ? result[0] : null;
 };
 
-const getAllUsers = () => {
+const getAllUsers = async () => {
   const query = `SELECT id,user_name,email,role,used_storage,allocated_storage,created_at FROM users`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query);
+  return result;
 };
 
-const updateUserRole = (role, allocatedStorage, id) => {
+const updateUserRole = async (role, allocatedStorage, id) => {
   const query = `UPDATE users SET role=?, allocated_storage=? WHERE id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [role, allocatedStorage, id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [role, allocatedStorage, id]);
+  return result;
 };
 
-const deleteUserById = (id) => {
+const deleteUserById = async (id) => {
   const query = `DELETE FROM users WHERE id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [id]);
+  return result;
 };
 
-const updateUserAllocatedStorage = (id, size) => {
+const updateUserAllocatedStorage = async (id, size) => {
   const query = `UPDATE users SET allocated_storage=? WHERE id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [size, id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [size, id]);
+  return result;
 };
-const updateUserSize = (id, size) => {
+
+const updateUserSize = async (id, size) => {
   const query = `UPDATE users SET used_storage=? WHERE id=?`;
-  return new Promise((resolve, reject) => {
-    db.query(query, [size, id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
-    });
-  });
+  const [result] = await db.promise().query(query, [size, id]);
+  return result;
 };
 
 module.exports = {
@@ -92,3 +60,4 @@ module.exports = {
   updateUserAllocatedStorage,
   updateUserSize,
 };
+

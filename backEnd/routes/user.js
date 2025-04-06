@@ -6,12 +6,16 @@ const {
   updateFolderName,
   getFolderInfo,
   deleteFolder,
+} = require("../controllers/user/folderOperations.jsx");
+
+const {
   uploadFile,
   getFilesByFolderId,
   getFiles,
   getFileInfo,
   deleteFile,
-} = require("../controllers/user.js");
+} = require("../controllers/user/fileOperations.jsx");
+
 const { verifyOwner } = require("../middleware/verifyOwner.js");
 
 const router = express.Router();
