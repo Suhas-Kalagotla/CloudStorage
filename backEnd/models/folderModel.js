@@ -28,7 +28,9 @@ const getAllFolders = async () => {
 const insertFolder = async (name, parentFolderId, location, size, userId) => {
   const query = `INSERT IGNORE INTO folder (id,name,parent_folder_id,location,size,user_id) VALUES (?,?,?,?,?,?)`;
   const id = uuidv4();
-  const [result] = await db.promise().query(query, [id, name, parentFolderId, location, size, userId]);
+  const [result] = await db
+    .promise()
+    .query(query, [id, name, parentFolderId, location, size, userId]);
   return { result, id };
 };
 
@@ -67,4 +69,3 @@ module.exports = {
   updateFolderNameDB,
   deleteFolderDB,
 };
-

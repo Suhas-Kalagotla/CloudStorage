@@ -32,12 +32,6 @@ const updateUser = async (req, res) => {
 
     const user = await getUserById(id);
 
-    const folderResponse = await updateFolderSize(user.id, allocatedStorage);
-
-    if (folderResponse.affectedRows === 0) {
-      return res.status(501).json({ error: "Failed to update size of folder" });
-    }
-
     const result = await updateUserRole(role, allocatedStorage, id);
     if (result.affectedRows === 0) {
       return res.status(501).json({ error: "Failed to update User" });
