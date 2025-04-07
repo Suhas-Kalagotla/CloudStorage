@@ -71,6 +71,7 @@ const Home = () => {
         fetchFolders(folderId || user?.id);
       } else if (type === "file") {
         response = await deleteFileApi(id, folderId || user?.id);
+        updateUsedStorage(response.data.userSize);
         fetchFiles(folderId || user?.id);
       }
       setIsActive({ id: null, type: null });

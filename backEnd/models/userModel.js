@@ -4,7 +4,9 @@ const { v4: uuidv4 } = require("uuid");
 const insertUser = async (userName, email, password, role) => {
   const query = `INSERT IGNORE INTO users (id,user_name, email , password,role) VALUES (?, ?, ?, ?, ?)`;
   const id = uuidv4();
-  const [result] = await db.promise().query(query, [id, userName, email, password, role]);
+  const [result] = await db
+    .promise()
+    .query(query, [id, userName, email, password, role]);
   return result;
 };
 
@@ -28,7 +30,9 @@ const getAllUsers = async () => {
 
 const updateUserRole = async (role, allocatedStorage, id) => {
   const query = `UPDATE users SET role=?, allocated_storage=? WHERE id=?`;
-  const [result] = await db.promise().query(query, [role, allocatedStorage, id]);
+  const [result] = await db
+    .promise()
+    .query(query, [role, allocatedStorage, id]);
   return result;
 };
 
@@ -45,9 +49,13 @@ const updateUserAllocatedStorage = async (id, size) => {
 };
 
 const updateUserSize = async (id, size) => {
-  const query = `UPDATE users SET used_storage=? WHERE id=?`;
-  const [result] = await db.promise().query(query, [size, id]);
-  return result;
+  const updateQuery = `UPDATE users SET used_storage = used_storage + ? WHERE id = ?`;
+  await db.promise().query(updateQuery, [size, id]);
+
+  const selectQuery = `SELECT used_storage FROM users WHERE id = ?`;
+  const [[user]] = await db.promise().query(selectQuery, [id]);
+
+  return user.used_storage;
 };
 
 module.exports = {
@@ -60,4 +68,3 @@ module.exports = {
   updateUserAllocatedStorage,
   updateUserSize,
 };
-

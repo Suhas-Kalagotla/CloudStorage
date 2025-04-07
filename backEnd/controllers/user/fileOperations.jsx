@@ -6,7 +6,7 @@ const {
   getFolderById,
   getUniqueFolder,
   getRootFolder,
-  updateFolderSize,
+  updateAllParentFoldersSize,
 } = require("../../models/folderModel");
 const { updateUserSize, getUserById } = require("../../models/userModel.js");
 const {
@@ -56,16 +56,14 @@ const uploadFile = async (req, res) => {
     fs.appendFileSync(filePath, decryptedChunk);
 
     fileSize = (fileSize / (1024 * 1024)).toFixed(2);
-    let folderSize, userSize;
+    let folderSize;
     if (isLastChunk === "true") {
       await connection.beginTransaction();
 
       const result = await insertFile(fileName, filePath, fileSize, folder.id);
-      folderSize = parseFloat(folder.size) + parseFloat(fileSize);
-      userSize = parseFloat(userDatabase.used_storage) + parseFloat(fileSize);
 
-      await updateFolderSize(folder.id, folderSize);
-      await updateUserSize(user.id, userSize);
+      await updateAllParentFoldersSize(folder.id, fileSize, connection);
+      const user_usedStorage = await updateUserSize(user.id, fileSize);
 
       if (!result || result.affectedRows == 0) {
         await connection.rollback();
@@ -77,7 +75,7 @@ const uploadFile = async (req, res) => {
       res.status(201).json({
         message: "File uploaded and decrypted successfully",
         folderSize: folderSize,
-        userSize: userSize,
+        userSize: user_usedStorage,
       });
     } else {
       res.status(200).json({
@@ -161,32 +159,29 @@ const getFileInfo = async (req, res) => {
 const deleteFile = async (req, res) => {
   const connection = await db.promise().getConnection();
   try {
-    const { fileId, folderId } = req.query;
+    const { fileId } = req.query;
     const user = req.user;
-    const [file, folder, userDatabase] = await Promise.all([
-      getFileInfoDB(fileId),
-      getFolderById(folderId),
-      getUserById(user.id),
-    ]);
+    const folder = req.folder;
+    const file = await getFileInfoDB(fileId);
 
     if (!file) return res.status(409).json({ error: "No file found" });
 
     let fileSize = parseFloat(file.size);
-    console.log(folder);
-    let folderSize = parseFloat(folder.size) - fileSize;
-    let userSize = parseFloat(userDatabase.used_storage) - fileSize;
 
     await connection.beginTransaction();
 
-    await updateFolderSize(folder.id, folderSize);
-    await updateUserSize(user.id, userSize);
+    await updateAllParentFoldersSize(folder.id, -fileSize, connection);
+    const user_usedStorage = await updateUserSize(user.id, -fileSize);
     await deleteFileDB(file.id);
 
     await connection.commit();
 
     await rmFile(file.location);
 
-    res.status(200).json({ message: `${file.name} deleted successfully` });
+    res.status(200).json({
+      message: `${file.name} deleted successfully`,
+      userSize: user_usedStorage,
+    });
   } catch (err) {
     if (connection) await connection.rollback();
     console.error(err);

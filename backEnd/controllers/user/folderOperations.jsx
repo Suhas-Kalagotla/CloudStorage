@@ -15,6 +15,8 @@ const {
   rmFolder,
 } = require("../../utils/folderUtils.js");
 
+const { countFiles } = require("../../models/fileModel.js");
+
 const getFolders = async (req, res) => {
   try {
     const folder = req.folder;

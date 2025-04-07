@@ -58,6 +58,22 @@ const updateFolderNameDB = async (id, name, location) => {
   return result;
 };
 
+const updateAllParentFoldersSize = async (folderId, fileSize, connection) => {
+  const query = `
+    WITH RECURSIVE parent_folders AS (
+      SELECT id, parent_folder_id FROM folder WHERE id = ?
+      UNION ALL
+      SELECT f.id, f.parent_folder_id 
+      FROM folder f 
+      INNER JOIN parent_folders p ON f.id = p.parent_folder_id
+    )
+    UPDATE folder 
+    SET size = size + ? 
+    WHERE id IN (SELECT id FROM parent_folders);
+  `;
+  await connection.query(query, [folderId, fileSize]);
+};
+
 module.exports = {
   getAllFolders,
   getRootFolder,
@@ -68,4 +84,5 @@ module.exports = {
   updateFolderSize,
   updateFolderNameDB,
   deleteFolderDB,
+  updateAllParentFoldersSize,
 };
