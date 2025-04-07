@@ -5,9 +5,15 @@ import {
   updateFolderNameApi,
   deleteFolderApi,
 } from "../services/folderServices";
+import { generateUniqueName } from "../utils/genUniqueName";
 
-const useFolders = (setPopupMessage, setIsActive) => {
-  const [folders, setFolders] = useState([]);
+const useFolders = (
+  folders,
+  setFolders,
+  setPopupMessage,
+  setIsActive,
+  files = [],
+) => {
   const [tempFolder, setTempFolder] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,7 +31,7 @@ const useFolders = (setPopupMessage, setIsActive) => {
 
   const createFolder = async (parentFolderId, newName) => {
     try {
-      const uniqueName = generateUniqueFolderName(newName);
+      const uniqueName = generateUniqueName(newName, files, folders);
       const response = await createFolderApi(parentFolderId, uniqueName);
       setIsActive({ id: response.folderId, type: "folder" });
       setTempFolder(null);
@@ -37,30 +43,14 @@ const useFolders = (setPopupMessage, setIsActive) => {
   };
 
   const updateFolderName = async (folderId, parent_folder_id, newName) => {
-    const uniqueName = generateUniqueFolderName(newName, folderId);
+    const uniqueName = generateUniqueName(newName, files, folders, folderId);
     try {
       await updateFolderNameApi(folderId, uniqueName);
-      fetchFolders(parent_folder_id);
     } catch (err) {
       setPopupMessage("Failed to update folder name");
+    } finally {
+      fetchFolders(parent_folder_id);
     }
-  };
-
-  const generateUniqueFolderName = (baseName, id = null) => {
-    let name = baseName;
-    let count = 1;
-    let folderName;
-    if (id)
-      folderName = folders
-        .filter((folder) => folder.id !== id)
-        .map((folder) => folder.name);
-    else folderName = folders.map((folder) => folder.name);
-
-    while (folderName.includes(name)) {
-      name = `${baseName} ${count}`;
-      count++;
-    }
-    return name;
   };
 
   const deleteFolder = async (folderId) => {

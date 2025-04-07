@@ -45,7 +45,7 @@ export const createFolderApi = async (parentId, newName) => {
 export const updateFolderNameApi = async (folderId, folderName) => {
   try {
     await axios.patch(
-      `${url}/user/updateName`,
+      `${url}/user/updateFolderName`,
       {},
       {
         params: { folderId, folderName },

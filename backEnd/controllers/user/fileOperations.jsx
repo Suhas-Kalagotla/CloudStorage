@@ -14,9 +14,10 @@ const {
   getAllFiles,
   getFileInfoDB,
   deleteFileDB,
+  updateFileNameDB,
 } = require("../../models/fileModel.js");
 
-const { rmFile } = require("../../utils/fileUtils.js");
+const { rmFile, renameFile } = require("../../utils/fileUtils.js");
 const cryptoJs = require("crypto-js");
 
 const uploadFile = async (req, res) => {
@@ -191,10 +192,42 @@ const deleteFile = async (req, res) => {
   }
 };
 
+const updateFileName = async (req, res) => {
+  try {
+    const { fileId, fileName } = req.query;
+    const folder = req.folder;
+    const file = await getFileInfoDB(fileId);
+
+    if (!file) {
+      return res.status(409).json({ error: "File doesn't exists" });
+    }
+
+    const updateFileLocation = await renameFile(file.location, fileName);
+    if (!updateFileLocation) {
+      return res.status(409).json({ error: "Failed to rename file" });
+    }
+
+    const updateFileMetaData = await updateFileNameDB(
+      file.id,
+      fileName,
+      updateFileLocation,
+    );
+
+    if (!updateFileMetaData) {
+      return res.status(409).json({ error: "Failed to rename file" });
+    }
+    res.status(200).json({ message: "File name updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server Error " });
+  }
+};
+
 module.exports = {
   uploadFile,
   getFilesByFolderId,
   getFiles,
   getFileInfo,
   deleteFile,
+  updateFileName,
 };

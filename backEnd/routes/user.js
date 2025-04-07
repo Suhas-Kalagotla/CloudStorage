@@ -14,6 +14,7 @@ const {
   getFiles,
   getFileInfo,
   deleteFile,
+  updateFileName,
 } = require("../controllers/user/fileOperations.jsx");
 
 const { verifyOwner } = require("../middleware/verifyOwner.js");
@@ -27,7 +28,8 @@ router.get("/getAllFiles", verifyOwner, getFilesByFolderId);
 router.get("/getFileInfo", verifyOwner, getFileInfo);
 router.post("/createFolder", createFolder);
 router.post("/fileUpload", upload, uploadFile);
-router.patch("/updateName", verifyOwner, updateFolderName);
+router.patch("/updateFolderName", verifyOwner, updateFolderName);
+router.patch("/updateFileName", verifyOwner, updateFileName);
 router.delete("/deleteFolder", verifyOwner, deleteFolder);
 router.delete("/deleteFile", verifyOwner, deleteFile);
 

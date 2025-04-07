@@ -4,15 +4,19 @@ import "./home.css";
 import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
 import { PopUp, ActiveInfo, Loading, ImageDisplay } from "../";
-import fileUpload from "../../utils/fileUpload";
 import useFolders from "../../hooks/useFolders";
 import useFiles from "../../hooks/useFiles";
-import { deleteFolderApi } from "../../services/folderServices";
-import { deleteFileApi } from "../../services/fileServices";
 import { useUser } from "../../context/UserContext.jsx";
+
+import {
+  handleDelete as deleteHandler,
+  handleFileSelection as fileSelectionHandler,
+} from "./homeHandlers";
 
 const Home = () => {
   const folderContainerRef = useRef(null);
+  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState([]);
   const { user, updateUsedStorage } = useUser();
   const [popupMessage, setPopupMessage] = useState(null);
   const [isActive, setIsActive] = useState({ id: null, type: null });
@@ -21,20 +25,19 @@ const Home = () => {
   const { folderId } = useParams();
 
   const {
-    folders,
     tempFolder,
     setTempFolder,
     createFolder,
     updateFolderName,
     fetchFolders,
     isLoading: foldersLoading,
-  } = useFolders(setPopupMessage, setIsActive);
+  } = useFolders(folders,setFolders,setPopupMessage, setIsActive, files);
 
   const {
-    files,
     fetchFiles,
+    updateFileName,
     isLoading: filesLoading,
-  } = useFiles(setPopupMessage);
+  } = useFiles(files, setFiles, setPopupMessage, folders);
 
   const fileInputRef = useRef(null);
 
@@ -62,72 +65,34 @@ const Home = () => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
   };
 
-  const handleDelete = async (id, type) => {
-    try {
-      let response;
+  const handleDelete = (id, type) =>
+    deleteHandler({
+      id,
+      type,
+      folderId,
+      user,
+      setIsActive,
+      setPopupMessage,
+      fetchFolders,
+      fetchFiles,
+      updateUsedStorage,
+    });
 
-      if (type === "folder") {
-        response = await deleteFolderApi(id);
-        fetchFolders(folderId || user?.id);
-      } else if (type === "file") {
-        response = await deleteFileApi(id, folderId || user?.id);
-        updateUsedStorage(response.data.userSize);
-        fetchFiles(folderId || user?.id);
-      }
-      setIsActive({ id: null, type: null });
-      setPopupMessage(response.data.message);
-    } catch (err) {
-      if (err.response) {
-        setPopupMessage(err.response.data.error);
-      } else {
-        setPopupMessage(err.message);
-      }
-    }
-  };
+  const handleFileSelection = (event) =>
+    fileSelectionHandler({
+      event,
+      setPopupMessage,
+      fetchFiles,
+      folderId,
+      user,
+      updateUsedStorage,
+    });
 
   const handleUpload = () => {
     setIsActive({ id: null, type: null });
     fileInputRef.current.click();
   };
 
-  const handleFileSelection = async (event) => {
-    if (!event.target || !event.target.files) {
-      setPopupMessage("No file selected");
-      return;
-    }
-    const selectedFiles = event.target.files;
-
-    if (!selectedFiles || selectedFiles.length === 0) {
-      setPopupMessage("No file selected");
-      return;
-    }
-    const filesArray = Array.from(selectedFiles);
-
-    try {
-      await Promise.all(
-        filesArray.map((file) =>
-          fileUpload(
-            file,
-            setPopupMessage,
-            fetchFiles,
-            folderId,
-            user.id,
-            user.used_storage,
-            user.allocated_storage,
-            updateUsedStorage,
-          ),
-        ),
-      );
-      setPopupMessage("Successfully uploaded");
-    } catch (err) {
-      setPopupMessage("Failed to upload one or more files");
-    }
-  };
-
-  //  const handleDoubleClick = (imageUrl) => {
-  //    setFullScreenImage(imageUrl);
-  //  };
-  //
   const nameValidate = (value) => {
     if (value.length === 0) return false;
     return true;
@@ -173,6 +138,9 @@ const Home = () => {
                 />
                 <EditableField
                   initialValue={name}
+                  onEditingComplete={(newName) =>
+                    updateFileName(id, folderId || user?.id, newName)
+                  }
                   type={"text"}
                   validate={nameValidate}
                   idEditing={true}

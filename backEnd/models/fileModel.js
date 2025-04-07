@@ -34,10 +34,17 @@ const deleteFileDB = async (file_id) => {
   return result;
 };
 
+const updateFileNameDB = async (id, name, location) => {
+  const query = `UPDATE file SET name = ?, location = ? WHERE id = ?`;
+  const [result] = await db.promise().query(query, [name, location, id]);
+  return result;
+};
+
 module.exports = {
   insertFile,
   getAllFiles,
   countFiles,
   getFileInfoDB,
   deleteFileDB,
+  updateFileNameDB,
 };

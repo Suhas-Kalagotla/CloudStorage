@@ -6,7 +6,6 @@ const {
   updateFolderNameDB,
   getUniqueFolder,
   getRootFolder,
-  updateFolderSize,
 } = require("../../models/folderModel.js");
 
 const {
@@ -94,21 +93,21 @@ const updateFolderName = async (req, res) => {
     if (!folder) {
       return res.status(409).json({ error: "Folder doesn't exists" });
     }
-    const updateFolder = await renameFolder(folder.location, folderName);
-    if (!updateFolder) {
+    const updateFolderLocation = await renameFolder(folder.location, folderName);
+    if (!updateFolderLocation) {
       return res.status(409).json({ error: "Failed to rename folder" });
     }
 
     const updateFolderMetaData = await updateFolderNameDB(
       folder.id,
       folderName,
-      updateFolder,
+      updateFolderLocation,
     );
 
     if (!updateFolderMetaData) {
       return res.status(409).json({ error: "Failed to rename folder" });
     }
-    res.status(200).json({ message: "Folder created successfully" });
+    res.status(200).json({ message: "Folder name updated successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server Error " });

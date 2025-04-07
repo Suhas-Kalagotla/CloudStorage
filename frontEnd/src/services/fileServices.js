@@ -36,3 +36,15 @@ export const deleteFileApi = async (fileId, folderId) => {
     throw err;
   }
 };
+
+export const updateFileNameApi = async (fileId,folderId, fileName) => {
+  try {
+    await axios.patch(
+      `${url}/user/updateFileName`,
+      {},
+      { params: { fileId, folderId, fileName }, withCredentials: true },
+    );
+  } catch (err) {
+    throw err;
+  }
+};
