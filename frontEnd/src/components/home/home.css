@@ -59,6 +59,11 @@
   border: 2px solid #007bff;
 }
 
+.files.active {
+  background-color: #f0f0f0;
+  border: 2px solid #007bff;
+}
+
 .editable-text {
   max-height: 100px;
   overflow: hidden;
@@ -78,3 +83,4 @@
   resize: none;
   overflow-wrap: break-word;
 }
+

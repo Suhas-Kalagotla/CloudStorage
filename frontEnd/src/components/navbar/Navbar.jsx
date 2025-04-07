@@ -1,13 +1,15 @@
 import { NavigateButton } from "../util";
-import React from "react";
+import React, { useState } from "react";
 import "./navbar.css";
 import { url } from "../../utils/url";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import { PopUp } from "../";
 
 const Navbar = ({ user }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [popupMessage, setPopupMessage] = useState(null);
 
   const logout = async () => {
     try {
@@ -21,7 +23,7 @@ const Navbar = ({ user }) => {
       localStorage.clear();
       navigate("/login");
     } catch (err) {
-      console.log(err);
+      setPopupMessage(err);
     }
   };
 
@@ -40,25 +42,20 @@ const Navbar = ({ user }) => {
         {user && user.role !== "validate" && (
           <>
             <NavigateButton name="Home" url="/" active={isActive("/")} />
-            <NavigateButton
-              name="Upload"
-              url="/upload"
-              active={isActive("/upload")}
-            />
           </>
         )}
         {user && user.role === "admin" && (
           <>
-          <NavigateButton
-            name="Users"
-            url="/admin/users"
-            active={isActive("/admin/users")}
-          />
-          <NavigateButton
-          name="Folders"
-          url="/admin/folders"
-          active={isActive("/admin/folders")}
-          />
+            <NavigateButton
+              name="Users"
+              url="/admin/users"
+              active={isActive("/admin/users")}
+            />
+            <NavigateButton
+              name="Folders"
+              url="/admin/folders"
+              active={isActive("/admin/folders")}
+            />
           </>
         )}
       </div>
@@ -71,6 +68,14 @@ const Navbar = ({ user }) => {
           <button onClick={() => logout()}> Logout</button>
         )}
       </div>
+      {popupMessage !== null && (
+        <PopUp
+          message={popupMessage}
+          onClose={() => {
+            setPopupMessage(null);
+          }}
+        />
+      )}
     </div>
   );
 };

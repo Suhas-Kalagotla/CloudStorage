@@ -12,8 +12,9 @@ const verifyOwner = async (req, res, next) => {
     }
 
     const { folderId } = req.query;
+
     if (!folderId) {
-      return res.status(400).json({ error: "folderId is required" });
+      return res.status(400).json({ error: "FolderId is required" });
     }
 
     let folder;
@@ -23,6 +24,9 @@ const verifyOwner = async (req, res, next) => {
     } else {
       folder = await getFolderById(folderId);
     }
+    if (!folder) {
+      return res.status(400).json({ error: "Folder does not exist" });
+    }
 
     if (folder.user_id !== user.id) {
       return res.status(403).json({ error: "Forbidden to access" });
@@ -31,7 +35,7 @@ const verifyOwner = async (req, res, next) => {
     req.folder = folder;
     next();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -1,34 +1,43 @@
 import React, { useRef, useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import "./home.css";
 import { FolderIcon, EditableField } from "../util";
 import StorageBar from "../storageBar/StorageBar.jsx";
-import PopUp from "../popup/popup.js";
+import { PopUp, ActiveInfo, Loading, ImageDisplay } from "../";
 import useFolders from "../../hooks/useFolders";
-import "./home.css";
-import FolderInfo from "../folderInfo/FolderInfo";
-import { useParams } from "react-router-dom";
-import fileUpload from "../../utils/fileUpload";
 import useFiles from "../../hooks/useFiles";
-import { ImageIcon } from "../util/ImageIcon";
+import { useUser } from "../../context/UserContext.jsx";
 
-const Home = ({ user }) => {
+import {
+  handleDelete as deleteHandler,
+  handleFileSelection as fileSelectionHandler,
+} from "./homeHandlers";
+
+const Home = () => {
   const folderContainerRef = useRef(null);
-  const [animated, setAnimated] = useState(false);
-  const [usedStorage, setStorage] = useState(user.used_storage);
+  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const { user, updateUsedStorage } = useUser();
   const [popupMessage, setPopupMessage] = useState(null);
+  const [isActive, setIsActive] = useState({ id: null, type: null });
+  const [index, setIndex] = useState(null);
+
   const { folderId } = useParams();
 
   const {
-    folders,
     tempFolder,
-    activeFolderId,
     setTempFolder,
-    setActiveFolderId,
     createFolder,
     updateFolderName,
     fetchFolders,
-  } = useFolders(user, setPopupMessage);
+    isLoading: foldersLoading,
+  } = useFolders(folders,setFolders,setPopupMessage, setIsActive, files);
 
-  const { files, fetchFiles } = useFiles(user, setPopupMessage);
+  const {
+    fetchFiles,
+    updateFileName,
+    isLoading: filesLoading,
+  } = useFiles(files, setFiles, setPopupMessage, folders);
 
   const fileInputRef = useRef(null);
 
@@ -38,44 +47,50 @@ const Home = ({ user }) => {
         folderContainerRef.current &&
         !folderContainerRef.current.contains(event.target)
       )
-        setActiveFolderId(null);
+        setIsActive({ id: null, type: null });
     };
     document.addEventListener("dblclick", handleClickOutSide);
     return () => {
       document.removeEventListener("dblclick", handleClickOutSide);
     };
-  }, [setActiveFolderId]);
+  }, [setIsActive]);
 
   useEffect(() => {
-    if (animated) setAnimated(true);
     fetchFolders(folderId || user?.id);
     fetchFiles(folderId || user?.id);
-    setActiveFolderId(null);
-  }, [animated, folderId]);
+    setIsActive({ id: null, type: null });
+  }, [folderId]);
 
   const handleCreateFolder = () => {
     setTempFolder({ id: "temp_id", name: "New Folder" });
   };
-  const handleUpload = () => {
-    fileInputRef.current.click();
-  };
 
-  const handleFileSelection = async (event) => {
-    const selectedFile = event.target.files[0];
-    if (!selectedFile) {
-      setPopupMessage("No file selected");
-      return;
-    }
-    await fileUpload(
-      selectedFile,
+  const handleDelete = (id, type) =>
+    deleteHandler({
+      id,
+      type,
+      folderId,
+      user,
+      setIsActive,
       setPopupMessage,
       fetchFolders,
+      fetchFiles,
+      updateUsedStorage,
+    });
+
+  const handleFileSelection = (event) =>
+    fileSelectionHandler({
+      event,
+      setPopupMessage,
+      fetchFiles,
       folderId,
-      user.id,
-      usedStorage,
-      user.allocated_storage,
-      setStorage,
-    );
+      user,
+      updateUsedStorage,
+    });
+
+  const handleUpload = () => {
+    setIsActive({ id: null, type: null });
+    fileInputRef.current.click();
   };
 
   const nameValidate = (value) => {
@@ -83,14 +98,17 @@ const Home = ({ user }) => {
     return true;
   };
 
+  if (filesLoading || foldersLoading) {
+    return <Loading />;
+  }
+
   return (
     <>
       <div className="homeContainer">
         <div className="homeHead">
           <StorageBar
-            usedStorage={usedStorage}
+            usedStorage={user.used_storage}
             totalStorage={user.allocated_storage}
-            animated={animated}
           />
           <button onClick={handleCreateFolder}>create folder</button>
           <button onClick={handleUpload}>upload</button>
@@ -99,16 +117,30 @@ const Home = ({ user }) => {
             type="file"
             ref={fileInputRef}
             style={{ display: "none" }}
+            multiple
             onChange={handleFileSelection}
           />
         </div>
         <div className="homeBody">
           <div className="folderContainer">
-            {files.map(({ name, id, imageUrl }) => (
-              <div className="files" key={id}>
-                <ImageIcon name={name} imageUrl={imageUrl} />
+            {files.map(({ name, id, imageUrl }, index) => (
+              <div
+                className={`files ${isActive.id === id ? "active" : ""}`}
+                key={id}
+                onClick={() => setIsActive({ id: id, type: "file" })}
+              >
+                <ImageDisplay
+                  name={name}
+                  imageUrl={imageUrl}
+                  files={files}
+                  setIndex={setIndex}
+                  index={index}
+                />
                 <EditableField
                   initialValue={name}
+                  onEditingComplete={(newName) =>
+                    updateFileName(id, folderId || user?.id, newName)
+                  }
                   type={"text"}
                   validate={nameValidate}
                   idEditing={true}
@@ -119,8 +151,8 @@ const Home = ({ user }) => {
             {folders.map(({ id, name, parent_folder_id }) => (
               <div
                 key={id}
-                className={`folder ${activeFolderId === id ? "active" : ""} `}
-                onClick={() => setActiveFolderId(id)}
+                className={`folder ${isActive.id === id ? "active" : ""} `}
+                onClick={() => setIsActive({ id: id, type: "folder" })}
                 ref={folderContainerRef}
               >
                 <FolderIcon folderId={id} />
@@ -151,12 +183,25 @@ const Home = ({ user }) => {
             )}
           </div>
           <div className="folderInfo">
-            {activeFolderId && <FolderInfo folderId={activeFolderId} />}
+            {isActive.id && (
+              <ActiveInfo
+                activeId={isActive.id}
+                activeType={isActive.type}
+                setIsActive={setIsActive}
+                currentFolderId={folderId || user?.id}
+                handleDelete={handleDelete}
+              />
+            )}
           </div>
         </div>
       </div>
       {popupMessage !== null && (
-        <PopUp message={popupMessage} onClose={() => setPopupMessage(null)} />
+        <PopUp
+          message={popupMessage}
+          onClose={() => {
+            setPopupMessage(null);
+          }}
+        />
       )}
     </>
   );

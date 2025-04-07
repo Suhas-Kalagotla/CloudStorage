@@ -4,14 +4,11 @@ import { url } from "../utils/url";
 export const getFolderInfo = async (folderId) => {
   try {
     const response = await axios.get(`${url}/user/getFolderInfo`, {
-      params: {
-        folderId: folderId,
-      },
+      params: { folderId: folderId },
       withCredentials: true,
     });
     return response.data.folder;
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
@@ -26,7 +23,6 @@ export const getFolders = async (folderId) => {
     });
     return response.data.folders;
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
@@ -42,7 +38,6 @@ export const createFolderApi = async (parentId, newName) => {
     );
     return response.data;
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
@@ -50,7 +45,7 @@ export const createFolderApi = async (parentId, newName) => {
 export const updateFolderNameApi = async (folderId, folderName) => {
   try {
     await axios.patch(
-      `${url}/user/updateName`,
+      `${url}/user/updateFolderName`,
       {},
       {
         params: { folderId, folderName },
@@ -58,7 +53,18 @@ export const updateFolderNameApi = async (folderId, folderName) => {
       },
     );
   } catch (err) {
-    console.log(err);
+    throw err;
+  }
+};
+
+export const deleteFolderApi = async (folderId) => {
+  try {
+    const response = await axios.delete(`${url}/user/deleteFolder`, {
+      params: { folderId: folderId },
+      withCredentials: true,
+    });
+    return response;
+  } catch (err) {
     throw err;
   }
 };

@@ -37,7 +37,20 @@ const renameFolder = (folderPath, newName) => {
   });
 };
 
+const rmFolder = (folderPath) => {
+  return new Promise((resolve, reject) => {
+    fs.rmdir(folderPath, { recursive: false }, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ message: "success" });
+      }
+    });
+  });
+};
+
 module.exports = {
   mkdirFolder,
   renameFolder,
+  rmFolder,
 };

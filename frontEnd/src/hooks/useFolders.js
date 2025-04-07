@@ -3,27 +3,37 @@ import {
   getFolders,
   createFolderApi,
   updateFolderNameApi,
+  deleteFolderApi,
 } from "../services/folderServices";
+import { generateUniqueName } from "../utils/genUniqueName";
 
-const useFolders = (user, setPopupMessage) => {
-  const [folders, setFolders] = useState([]);
+const useFolders = (
+  folders,
+  setFolders,
+  setPopupMessage,
+  setIsActive,
+  files = [],
+) => {
   const [tempFolder, setTempFolder] = useState(null);
-  const [activeFolderId, setActiveFolderId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchFolders = async (folderId) => {
     try {
+      setIsLoading(true);
       const folders = await getFolders(folderId);
       setFolders(folders);
     } catch (err) {
       setPopupMessage("Failed to fetch folders");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const createFolder = async (parentFolderId, newName) => {
     try {
-      const uniqueName = generateUniqueFolderName(newName);
+      const uniqueName = generateUniqueName(newName, files, folders);
       const response = await createFolderApi(parentFolderId, uniqueName);
-      setActiveFolderId(response.folderId);
+      setIsActive({ id: response.folderId, type: "folder" });
       setTempFolder(null);
       fetchFolders(parentFolderId);
     } catch (err) {
@@ -33,42 +43,35 @@ const useFolders = (user, setPopupMessage) => {
   };
 
   const updateFolderName = async (folderId, parent_folder_id, newName) => {
-    const uniqueName = generateUniqueFolderName(newName, folderId);
+    const uniqueName = generateUniqueName(newName, files, folders, folderId);
     try {
       await updateFolderNameApi(folderId, uniqueName);
-      fetchFolders(parent_folder_id);
     } catch (err) {
       setPopupMessage("Failed to update folder name");
+    } finally {
+      fetchFolders(parent_folder_id);
     }
   };
 
-  const generateUniqueFolderName = (baseName, id = null) => {
-    let name = baseName;
-    let count = 1;
-    let folderName;
-    if (id)
-      folderName = folders
-        .filter((folder) => folder.id !== id)
-        .map((folder) => folder.name);
-    else folderName = folders.map((folder) => folder.name);
-
-    while (folderName.includes(name)) {
-      name = `${baseName} ${count}`;
-      count++;
+  const deleteFolder = async (folderId) => {
+    try {
+      await deleteFolderApi(folderId);
+      setIsActive({ id: null, type: null });
+    } catch (err) {
+      setPopupMessage("Failed to delete folder");
     }
-    return name;
   };
 
   return {
     folders,
     tempFolder,
     setPopupMessage,
-    activeFolderId,
     setTempFolder,
-    setActiveFolderId,
     createFolder,
     updateFolderName,
     fetchFolders,
+    isLoading,
+    deleteFolder,
   };
 };
 

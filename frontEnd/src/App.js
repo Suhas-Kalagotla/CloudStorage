@@ -1,5 +1,5 @@
 import "./App.css";
-import React from "react"; 
+import React from "react";
 import {
   Home,
   Login,
@@ -7,48 +7,39 @@ import {
   Dashboard,
   ErrorPage,
   Navbar,
-  Upload,
   Users,
   Landing,
   Folders,
 } from "./components";
-import { Loading } from "./components/util";
 import { ProtectedRoute } from "./components/util/ProtectedRoute";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { UserProvider } from "./context/UserContext";
 
 function AppContent() {
+  const location = useLocation();
+  const [currentForm, setCurrentForm] = useState("login");
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  const hideNavbarPaths = ["/login"];
+
   const toggleForm = (formName) => {
     setCurrentForm(formName);
   };
-
-  const location = useLocation();
-  const [currentForm, setCurrentForm] = useState("login");
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const hideNavbarPaths = ["/login"];
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      setUser(JSON.parse(user));
-    }
-    setLoading(false);
-  }, [navigate]);
 
   const handleLogin = (user) => {
     setUser(user);
     localStorage.setItem("user", JSON.stringify(user));
   };
-  if (loading) return <Loading />;
+
   return (
     <>
       {!hideNavbarPaths.includes(location.pathname) && <Navbar user={user} />}
@@ -58,7 +49,7 @@ function AppContent() {
             <ProtectedRoute allowedRoles={["user", "admin"]} user={user} />
           }
         >
-          <Route path="/" element={<Home user={user} />} />
+          <Route path="/" element={<Home />} />
         </Route>
         <Route
           path="/login"
@@ -79,11 +70,7 @@ function AppContent() {
           <Route path="folders" element={<Folders />} />
         </Route>
         <Route path="/landing" element={<Landing />} />
-        <Route path="/upload" element={<Upload />} />
-        <Route
-          path="/folders/:folderId"
-          element={<Home user={user} />}
-        />
+        <Route path="/folders/:folderId" element={<Home />} />
         <Route
           path="/unauthorized"
           element={
@@ -108,9 +95,11 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <div className="App">
-        <AppContent />
-      </div>
+      <UserProvider>
+        <div className="App">
+          <AppContent />
+        </div>
+      </UserProvider>
     </Router>
   );
 }

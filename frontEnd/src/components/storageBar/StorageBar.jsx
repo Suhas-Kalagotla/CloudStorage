@@ -2,7 +2,7 @@ import "./storageBar.css";
 import React from "react";
 import { useEffect, useState, useCallback } from "react";
 
-const StorageBar = ({ usedStorage, totalStorage, animated }) => {
+const StorageBar = ({ usedStorage, totalStorage, animated = true }) => {
   const percentage = (usedStorage / totalStorage) * 100;
   const [width, setWidth] = useState(0);
 

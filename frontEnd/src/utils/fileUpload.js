@@ -5,12 +5,12 @@ import { url } from "../utils/url";
 const fileUpload = async (
   file,
   setPopupMessage,
-  fetchFolders,
+  fetchFiles,
   folderId,
   userId,
   usedStorage,
   allocatedStorage,
-  setStorage,
+  updateUsedStorage,
 ) => {
   if (!file) {
     setPopupMessage("No file selected");
@@ -40,12 +40,10 @@ const fileUpload = async (
         withCredentials: true,
       });
       if (isLastChunk) {
-        setPopupMessage("Successfully uploaded");
-        fetchFolders(folderId || userId);
-        setStorage(response.data.userSize);
+        fetchFiles(folderId || userId);
+        updateUsedStorage(response.data.userSize);
       }
     } catch (err) {
-      console.log(err);
       setPopupMessage(err.message);
     }
   };
