@@ -56,7 +56,6 @@ const uploadFile = async (req, res) => {
 
     fs.appendFileSync(filePath, decryptedChunk);
 
-    fileSize = (fileSize / (1024 * 1024)).toFixed(2);
     let folderSize;
     if (isLastChunk === "true") {
       await connection.beginTransaction();
@@ -167,7 +166,7 @@ const deleteFile = async (req, res) => {
 
     if (!file) return res.status(409).json({ error: "No file found" });
 
-    let fileSize = parseFloat(file.size);
+    let fileSize = file.size;
 
     await connection.beginTransaction();
 
