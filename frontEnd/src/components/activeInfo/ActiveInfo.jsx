@@ -3,6 +3,7 @@ import { getFolderInfo } from "../../services/folderServices";
 import { getFileInfo } from "../../services/fileServices";
 import PopUp from "../popup/popup.js";
 import "./activeInfo.css";
+import { formatStorage } from "../../utils/fileFormat.js";
 
 const ActiveInfo = ({
   activeId,
@@ -41,7 +42,7 @@ const ActiveInfo = ({
     <>
       <div className="folderInfoContainer">
         <p> Type : {data?.type} </p>
-        <p> Size : {data?.size} </p>
+        <p> Size : {formatStorage(data?.size)} </p>
         <p>
           Create At :{" "}
           {new Date(data?.created_at)
