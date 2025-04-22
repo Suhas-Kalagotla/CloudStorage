@@ -1,6 +1,7 @@
 import "./storageBar.css";
 import React from "react";
 import { useEffect, useState, useCallback } from "react";
+import { formatStorage } from "../../utils/fileFormat";
 
 const StorageBar = ({ usedStorage, totalStorage, animated = true }) => {
   const percentage = (usedStorage / totalStorage) * 100;
@@ -35,7 +36,7 @@ const StorageBar = ({ usedStorage, totalStorage, animated = true }) => {
         <span data-label="Memory used" style={{ width: `${width}%` }}></span>
       </div>
       <p>
-        {usedStorage} / {totalStorage} gb
+        {formatStorage(usedStorage)} / {formatStorage(totalStorage)}
       </p>
     </div>
   );

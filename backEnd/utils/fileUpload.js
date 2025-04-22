@@ -2,7 +2,7 @@ const Busboy = require("busboy");
 
 const upload = (req, res, next) => {
   if (req.headers["content-type"]?.includes("multipart/form-data")) {
-    const busboy = new Busboy({ headers: req.headers });
+    const busboy = Busboy({ headers: req.headers });
     req.fileData = {};
 
     busboy.on("field", (fieldname, value) => {

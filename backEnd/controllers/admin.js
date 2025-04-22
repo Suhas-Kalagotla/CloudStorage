@@ -31,6 +31,7 @@ const updateUser = async (req, res) => {
       return res.status(501).json({ error: "Invalid values" });
 
     const user = await getUserById(id);
+    allocatedStorage = allocatedStorage * 1000000000;
 
     const result = await updateUserRole(role, allocatedStorage, id);
     if (result.affectedRows === 0) {
